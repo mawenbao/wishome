@@ -1,8 +1,7 @@
 <style type="text/css">
 	#sidebar {
-		position: absolute;
-		right: 0px;
-		top:69px;
+		margin-top:20px;
+        margin-bottom: 20px;
 		max-width: 75%;
 		z-index: 1000;
 		background-color: #fee;
@@ -17,31 +16,35 @@
 	}
 
 </style>
-<div id="sidebar" style="display:none;">
-	<h4>Available pipelines</h4>
-	<dl>
-	{{ range $index, $value := .}}
-		<dt>{{$index}}</dt>
-		<dd>{{$value}}</dd>
-	{{end}}
-	</dl>
-	<h4>Flash</h4>
-	<dl>
-	{{ range $index, $value := .flash}}
-		<dt>{{$index}}</dt>
-		<dd>{{$value}}</dd>
-	{{end}}
-	</dl>
+<div class="row">
+    <div class="col-md-6 col-md-offset-4">
+        <div id="sidebar" ><!--style="display:none;">-->
+            <h4>Available pipelines</h4>
+            <dl>
+                {{ range $index, $value := .}}
+                <dt>{{$index}}</dt>
+                <dd>{{$value}}</dd>
+                {{end}}
+            </dl>
+            <h4>Flash</h4>
+            <dl>
+                {{ range $index, $value := .flash}}
+                <dt>{{$index}}</dt>
+                <dd>{{$value}}</dd>
+                {{end}}
+            </dl>
 
-	<h4>Errors</h4>
-	<dl>
-	{{ range $index, $value := .errors}}
-		<dt>{{$index}}</dt>
-		<dd>{{$value}}</dd>
-	{{end}}
-	</dl>
+            <h4>Errors</h4>
+            <dl>
+                {{ range $index, $value := .errors}}
+                <dt>{{$index}}</dt>
+                <dd>{{$value}}</dd>
+                {{end}}
+            </dl>
+        </div>
+        <a id="toggleSidebar" href="#" class="toggles"><i class="icon-chevron-left"></i></a>
+    </div>
 </div>
-<a id="toggleSidebar" href="#" class="toggles"><i class="icon-chevron-left"></i></a>
 
 <script>
 	$sidebar = 0;

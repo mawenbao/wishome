@@ -11,7 +11,7 @@ import (
 
 var (
     USER_NAME_REGEX = regexp.MustCompile(`^[a-zA-Z][-._0-9a-zA-Z]*[0-9a-zA-Z]$`)
-    USER_EMAIL_REGEX = regexp.MustCompile(`^[-._0-9a-zA-Z]@[-_0-9a-zA-Z]+\.[-._0-9a-zA-Z]+`)
+    USER_EMAIL_REGEX = regexp.MustCompile(`^[0-9a-zA-Z]([-._0-9a-zA-Z]*[0-9a-zA-Z])?[@[-_0-9a-zA-Z]+\.[-._0-9a-zA-Z]+`)
 )
 
 func ValidateSignup(v *revel.Validation, dbmap *gorp.DbMap, name, email, rawPass string) (result *revel.ValidationResult) {
@@ -74,7 +74,7 @@ func ValidateDbName(v *revel.Validation, name string, dbmap *gorp.DbMap) *revel.
 }
 
 func ValidateEmail(v *revel.Validation, email string) *revel.ValidationResult {
-    return v.Check(email, revel.Required{}, revel.MaxSize{50}, revel.MinSize{6}, revel.Email{})
+    return v.Check(email, revel.Required{}, revel.MaxSize{50}, revel.MinSize{6}, revel.Match{USER_EMAIL_REGEX})
 }
 
 func ValidateDbEmail(v *revel.Validation, email string, dbmap *gorp.DbMap) *revel.ValidationResult {

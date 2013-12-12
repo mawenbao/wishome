@@ -1,6 +1,3 @@
-drop database if exists wishomedb;
-
-create database if not exists wishomedb;
 use wishomedb;
 
 create table if not exists users(

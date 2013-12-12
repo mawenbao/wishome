@@ -1,23 +1,22 @@
 # title
-title.login = "Welcome to wishome"
-title.register = "Register on wishome"
+title.login = Welcome to wishome
+title.register = Register on wishome
 
 # navbar
-navbar.brand = "Wishome"
+navbar.brand = Wishome
 
 # form
-form.siginin.greeting = "Sign in to wishome"
-form.siginin.submit = "Sign in"
-form.signin.user = "User name"
-form.signin.password = "Password"
-form.signin.email = "Email address"
-form.signin.remember = "Remember me"
-form.signup.greeting = "Sign up to wishome"
-form.signup.submit = "Sign up"
-form.signup.user = %(form.signin.user)s
+form.siginin.greeting = Sign in to wishome
+form.signin.submit = Sign in
+form.signin.name = User name
+form.signin.password = Password
+form.signin.email = Email address
+form.signup.greeting = Sign up to wishome
+form.signup.submit = Sign up
+form.signup.name = %(form.signin.name)s
 form.signup.password = %(form.signin.password)s
 form.signup.email = %(form.signin.email)s
 
 #misc
-misc.signup.notice = "sign up"
-misc.signin.notice = "sign in"
+misc.signup.notice = sign up
+misc.signin.notice = sign in

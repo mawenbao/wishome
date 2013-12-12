@@ -5,6 +5,7 @@ import (
     "github.com/coopernurse/gorp"
     "github.com/robfig/revel"
     "github.com/mawenbao/wishome/app/models"
+    _ "github.com/go-sql-driver/mysql"
 )
 
 var (
@@ -82,25 +83,31 @@ func IsEmailExists(dbmap *gorp.DbMap, email string) bool {
 }
 
 func FindUserByName(dbmap *gorp.DbMap, name string) (u *models.User) {
+    u = new(models.User)
     err := dbmap.SelectOne(u, "select * from users where name=?", name)
     if nil != err {
-        revel.ERROR.Printf("failed to select user by name %s: %s", name, err)
+        revel.ERROR.Fatalf("failed to select user by name %s: %s", name, err)
+        return nil
     }
     return
 }
 
 func FindUserByEmail(dbmap *gorp.DbMap, email string) (u *models.User) {
+    u = new(models.User)
     err := dbmap.SelectOne(u, "select * from users where email=?", email)
     if nil != err {
         revel.ERROR.Printf("failed to select user by email %s: %s", email, err)
+        return nil
     }
     return
 }
 
 func FindUserByID(dbmap *gorp.DbMap, id int32) (u *models.User) {
+    u = new(models.User)
     err := dbmap.SelectOne(u, "select * from users where id=?", id)
     if nil != err {
         revel.ERROR.Printf("failed to select user by id %d: %s", id, err)
+        return nil
     }
     return
 }
