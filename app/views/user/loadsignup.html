@@ -1,0 +1,30 @@
+{{template "header.html" .}}
+{{template "navbar.html" .}}
+<div class="container">
+    <div class="row">
+        <form class="form-horizontal pull-right" role="form">
+            <div class="form-group">
+                <label for="inputEmail" class="col-sm-2 control-label">{{msg . "form.signup.email"}}</label>
+                <div class="col-sm-7">
+                    <input type="email" class="form-control" id="inputEmail" placeholder="{{msg . "form.signup.email"}}" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPasswd" class="col-sm-2 control-label">{{msg . "form.signup.password"}}</label>
+                <div class="col-sm-7">
+                    <input type="password" class="form-control" id="inputPasswd" placeholder="{{msg . "form.signup.password"}}" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-7">
+                    <button type="submit" class="btn btn-primary">{{msg . "form.signup.submit"}}</button>
+                </div>
+                <div class="col-sm-5">
+                    <a href="/user/signin" title="{{msg . "misc.signin.notice"}}">{{msg . "misc.signin.notice"}}</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{{template "footer.html" .}}
+
