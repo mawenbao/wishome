@@ -174,7 +174,7 @@ func checkCachedResetpassKey(name, key string) bool {
     var cachedKey string
     err := cache.Get(getResetpassKeyName(name), &cachedKey)
     if nil != err {
-        revel.ERROR.Printf("failed to get reset password key from cache: %s", err)
+        revel.ERROR.Printf("failed to get reset password key from cache for user %s key %s: %s", name, key, err)
         return false
     }
     if key != cachedKey {
@@ -206,7 +206,11 @@ func (c User) PreResetPass(name, email string) revel.Result {
     keyLen := app.MyGlobal[app.CONFIG_RESETPASS_KEY_LEN].(int)
     keyLife := app.MyGlobal[app.CONFIG_RESETPASS_KEY_LIFE].(time.Duration)
     key := common.NewReadableRandom(keyLen)
-    go cache.Set(getResetpassKeyName(name), key, keyLife)
+    revel.INFO.Printf("generate new reset password key %s for name %s", key, name)
+    err := cache.Set(getResetpassKeyName(name), key, keyLife)
+    if nil != err {
+        revel.ERROR.Println(err)
+    }
 
     resetPassUrl, found := revel.Config.String(app.CONFIG_APP_URL)
     if !found {
@@ -228,6 +232,7 @@ func (c User) PreResetPass(name, email string) revel.Result {
 }
 
 func (c User) PostResetPass(name, key string) revel.Result {
+    revel.INFO.Printf("post got reset password key %s for name %s", key, name)
     if !checkCachedResetpassKey(name, key) {
         c.Flash.Error(c.Message("user.resetpass.key.error"))
         return c.Redirect(routes.User.ResetPass())
@@ -236,6 +241,7 @@ func (c User) PostResetPass(name, key string) revel.Result {
 }
 
 func (c User) DoResetPass(name, password, key string) revel.Result {
+    revel.INFO.Printf("do got key %s for name %s", key, name)
     // check key first
     if !checkCachedResetpassKey(name, key) {
         c.Flash.Error(c.Message("user.resetpass.key.error"))
