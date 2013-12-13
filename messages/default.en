@@ -1,6 +1,11 @@
+# common
+common.user.none = User not found %s
+common.database.error = Database error
+
 # title
 title.login = Welcome to wishome
 title.register = Register on wishome
+title.resetpass = Reset your password
 
 # navbar
 navbar.brand = Wishome
@@ -16,7 +21,25 @@ form.signup.submit = Sign up
 form.signup.name = %(form.signin.name)s
 form.signup.password = %(form.signin.password)s
 form.signup.email = %(form.signin.email)s
+form.resetpass.submit = Commit
 
-#misc
+# flash messages
+user.greeting.new = welcome, %s
+user.greeting.old = welcome back, %s
+user.signin.succeeded = signed in successfully
+user.signup.succeeded = signed up successfully
+user.signout.succeeded = signed out successfully
+user.signin.failed = error signing in
+user.signup.failed = error signing up
+user.signout.failed = error signing out
+user.save.error.db = failed to save user in database
+user.resetpass.mail.succeeded = successfully sent reset password mail to %s
+user.resetpass.mail.failed = failed to send reset password mail to %s
+user.resetpass.key.error = wrong reset password key
+user.resetpass.succeeded = you have reset your password successfully 
+user.resetpass.failed = sorry, we failed to reset your password, please try again
+
+# misc
 misc.signup.notice = sign up
 misc.signin.notice = sign in
+misc.resetpass.notice = forgot password

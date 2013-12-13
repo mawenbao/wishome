@@ -1,18 +1,19 @@
 {{if .flash.success}}
-<div class="alert alert-success">
-	{{.flash.success}}
+<div class="text-center text-primary">
+{{.flash.success}}
 </div>
 {{end}}
 
 {{if or .errors .flash.error}}
-<div class="alert alert-error">
-	{{if .flash.error}}
-		{{.flash.error}}
-	{{end}}
-	<ul style="margin-top:10px;">
-		{{range .errors}}
-			<li>{{.}}</li>
-		{{end}}
-	</ul>
+<div class="text-center text-danger">
+    {{if .flash.error}}
+    {{.flash.error}}
+    {{end}}
+    <ul class="list-unstyled" style="margin-top:10px;">
+        {{range $key, $elem := .errors}}
+        <li>{{$key}}: {{$elem}}</li>
+        {{end}}
+    </ul>
 </div>
 {{end}}
+

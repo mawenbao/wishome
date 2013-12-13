@@ -9,6 +9,9 @@ create table if not exists users(
     primary key(id)
 ) AUTO_INCREMENT = 10;
 
+#drop index users_name on users;
+#drop index users_email on users;
+
 alter table users add unique index users_name(name);
 alter table users add unique index users_email(email);
 

@@ -1,3 +1,6 @@
 # todo list
 
 1. send email for confirmation after user signup
+2. recover password with email
+3. captcha verification
+

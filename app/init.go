@@ -1,9 +1,13 @@
 package app
 
 import (
+    "log"
+    "time"
     "github.com/robfig/revel"
 )
 
+// store global custom configuration in app.conf
+var MyGlobal map[string]interface{} = make(map[string]interface{})
 
 func init() {
 	// Filters is the default set of global filters.
@@ -19,5 +23,33 @@ func init() {
 		revel.InterceptorFilter,       // Run interceptors around the action.
 		revel.ActionInvoker,           // Invoke the action.
 	}
+
+    // set log flags
+    log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
+
+    revel.OnAppStart(parseCustomConfig)
+}
+
+// parse custom settings in app.conf and save in MyGlobal
+// parse failure will result in panic
+func parseCustomConfig() {
+    keyLen, found := revel.Config.Int(CONFIG_RESETPASS_KEY_LEN)
+    if !found {
+        keyLen = 32
+    } else {
+        MyGlobal[CONFIG_RESETPASS_KEY_LEN] = keyLen
+    }
+
+    keyLife, found := revel.Config.String(CONFIG_RESETPASS_KEY_LIFE)
+    if !found {
+        MyGlobal[CONFIG_RESETPASS_KEY_LIFE] = time.Duration(30 * time.Minute)
+    } else {
+        keyLifeTime, err := time.ParseDuration(keyLife)
+        if nil != err {
+            revel.ERROR.Printf("failed to parse %s in app.conf", CONFIG_RESETPASS_KEY_LIFE)
+            panic("parse app.conf custom config failed")
+        }
+        MyGlobal[CONFIG_RESETPASS_KEY_LIFE] = keyLifeTime
+    }
 }
 
