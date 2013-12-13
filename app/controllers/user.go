@@ -207,10 +207,7 @@ func (c User) PreResetPass(name, email string) revel.Result {
     keyLife := app.MyGlobal[app.CONFIG_RESETPASS_KEY_LIFE].(time.Duration)
     key := common.NewReadableRandom(keyLen)
     revel.INFO.Printf("generate new reset password key %s for name %s", key, name)
-    err := cache.Set(getResetpassKeyName(name), key, keyLife)
-    if nil != err {
-        revel.ERROR.Println(err)
-    }
+    go cache.Set(getResetpassKeyName(name), key, keyLife)
 
     resetPassUrl, found := revel.Config.String(app.CONFIG_APP_URL)
     if !found {
@@ -248,6 +245,14 @@ func (c User) DoResetPass(name, password, key string) revel.Result {
         return c.Redirect(routes.User.ResetPass())
     }
 
+    // check password
+    validators.ValidatePassword(c.Validation, password)
+    if c.Validation.HasErrors() {
+        c.Validation.Keep()
+        c.FlashParams()
+        return c.Redirect(routes.User.PostResetPass(name, key))
+    }
+
     // init db connection
     dbmgr := database.NewDbManager()
     if nil == dbmgr {
@@ -270,6 +275,7 @@ func (c User) DoResetPass(name, password, key string) revel.Result {
         return c.Redirect(routes.User.ResetPass())
     }
 
+    revel.INFO.Printf("successfully updated user password for %s", name)
     c.Flash.Success(c.Message("user.resetpass.succeeded"))
     return c.Redirect(routes.User.Signin())
 }

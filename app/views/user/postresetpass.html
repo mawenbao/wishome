@@ -20,7 +20,7 @@
                 <div class="form-group">
                     <label for="inputPasswd" class="col-md-5 control-label">{{msg . "form.signup.password"}}</label>
                     <div class="col-md-7">
-                        <input type="password" class="form-control" id="inputPasswd" name="password" placeholder="{{msg . "form.signup.password"}}" autofocus />
+                        <input type="password" class="form-control" id="inputPasswd" name="password" placeholder="{{msg . "form.signup.password"}}" autofocus required />
                     </div>
                 </div>
                 <input type="hidden" name="key" value="{{.key}}" />
