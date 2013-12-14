@@ -42,11 +42,11 @@ func MD5Sum(source string) string {
 }
 
 // iv is saved in cipher string[:aes.BlockSize]
-func AesEncrypt(source, key []byte) []byte {
+func AesEncrypt(source, key []byte) ([]byte, bool) {
     block, err := aes.NewCipher(key)
     if nil != err {
         revel.ERROR.Printf("failed to create aes cipher: %s", err)
-        panic(err)
+        return nil, false
     }
 
     sourceStr := EncodeBase64(source)
@@ -54,25 +54,25 @@ func AesEncrypt(source, key []byte) []byte {
     _, err = rand.Read(cipherStr[:aes.BlockSize])
     if nil != err {
         revel.ERROR.Printf("failed to generate random bytes: %s", err)
-        panic(err)
+        return nil, false
     }
     iv := cipherStr[:aes.BlockSize]
     cfb := cipher.NewCFBEncrypter(block, iv)
     cfb.XORKeyStream(cipherStr[aes.BlockSize:], []byte(sourceStr))
 
-    return cipherStr
+    return cipherStr, true
 }
 
-func AesDecrypt(source, key []byte) []byte {
+func AesDecrypt(source, key []byte) ([]byte, bool) {
     block, err := aes.NewCipher(key)
     if nil != err {
         revel.ERROR.Printf("failed to create aes cipher: %s", err)
-        panic(err)
+        return nil, false
     }
 
     if len(source) < aes.BlockSize {
         revel.ERROR.Printf("decrypt error: cipher string too short %s", source)
-        return []byte("")
+        return nil, false
     }
 
     iv := source[:aes.BlockSize]
@@ -87,25 +87,25 @@ func EncodeBase64(source []byte) string {
     return base64.StdEncoding.EncodeToString(source)
 }
 
-func DecodeBase64(source string) []byte {
+func DecodeBase64(source string) ([]byte, bool) {
     data, err := base64.StdEncoding.DecodeString(source)
     if nil != err {
         revel.ERROR.Printf("failed to decode %s with base64", source)
-        return []byte("")
+        return nil, false
     }
-    return data
+    return data, true
 }
 
 func EncodeToHexString(source []byte) string {
     return hex.EncodeToString(source)
 }
 
-func DecodeHexString(source string) []byte {
+func DecodeHexString(source string) ([]byte, bool) {
     target, err := hex.DecodeString(source)
     if nil != err {
         revel.ERROR.Printf("failed to decode hex string %s", source)
-        panic("decode hex string failed, check log")
+        return nil, false
     }
-    return target
+    return target, true
 }
 

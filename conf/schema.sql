@@ -1,9 +1,11 @@
 use wishomedb;
 
+drop table if exists users;
 create table if not exists users(
     id int not null auto_increment,
     name varchar(15) not null,
     email varchar(50) not null,
+    email_verified boolean not null default 0,
     password char(32) not null,
     salt char(255) not null,
     primary key(id)

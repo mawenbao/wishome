@@ -27,19 +27,37 @@ form.resetpass.submit = Commit
 user.greeting.new = welcome, %s
 user.greeting.old = welcome back, %s
 user.signin.succeeded = signed in successfully
-user.signup.succeeded = signed up successfully
-user.signout.succeeded = signed out successfully
 user.signin.failed = error signing in
+user.signin.failed.mail.notverified = your email address has not been verified
+user.signup.succeeded = signed up successfully
 user.signup.failed = error signing up
+user.signup.failed.exist.name = user name already exists
+user.signup.failed.exist.email = email address has been registered
+user.signup.key.error = wrong signup confirmation key
+user.signup.mail.verify.exist = you have already verified your email address
+user.signup.mail.resend = resend confirmation mail
+user.signup.mail.succeeded = we have sent an email to %s
+user.signup.mail.subject = [wishome] Confirm your email address
+user.signup.mail.content = Click %s to confirm your email address. Note that this link is only valid in %.0f minutes.<br/>You have to verify your email address before signing in to wishome.
+user.signout.succeeded = signed out successfully
 user.signout.failed = error signing out
 user.save.error.db = failed to save user in database
-user.resetpass.mail.succeeded = successfully sent reset password mail to %s
+user.resetpass.mail.succeeded = we have sent an email to %s
 user.resetpass.mail.failed = failed to send reset password mail to %s
+user.resetpass.mail.subject = [wishome] Reset your password on wishome
+user.resetpass.mail.content = Click %s to reset your password on wishome. Note that this link is only valid in %.0f minutes.
 user.resetpass.key.error = wrong reset password key
 user.resetpass.succeeded = you have reset your password successfully 
 user.resetpass.failed = sorry, we failed to reset your password, please try again
 
 # misc
 misc.signup.notice = sign up
+misc.signup.notice.verify.email = please remember to verify your email address
+misc.signup.notice.verify.succeeded = you have verified your email successfully
 misc.signin.notice = sign in
 misc.resetpass.notice = forgot password
+
+# misc errors
+error.internal = internal error
+error.database = database error
+error.need.signin = please sign in first

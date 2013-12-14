@@ -9,6 +9,7 @@ type User struct {
     ID int32 `db:"id"`
     Name string `db:"name"`
     Email string `db:"email"`
+    EmailVerified bool `db:"email_verified"`
     Password string `db:"password"`
     PassSalt string `db:"salt"` // 255 byte
 }

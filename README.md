@@ -1,3 +1,17 @@
 # wishome
 
 A simple web site built with revel.
+
+## Dependencies
+
+*  A local smtp server
+
+## TODO
+
+0. send mail with jobs module
+1. <del>send email for confirmation after user signup</del>
+2. <del>reset password via email</del>
+3. captcha verification
+4. use message translation in modules/validators package too
+5. change db handle from gorp.DbMap to database.DbManager in all the database related validate functions(validators/user.go) and database helper functions(database/db.go)
+

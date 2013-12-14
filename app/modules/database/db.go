@@ -97,6 +97,16 @@ func IsNameEmailExists(dbmap *gorp.DbMap, name, email string) bool {
     return 0 != count
 }
 
+var isEmailVerifiedSql = fmt.Sprintf("select count(*) from %s where name=? and email_verified!=0", app.TABLE_USERS)
+func IsEmailVerified(dbmap *gorp.DbMap, name string) bool {
+    count, err := dbmap.SelectInt(isEmailVerifiedSql, name)
+    if nil != err {
+        revel.ERROR.Printf("db query failed: %s", err)
+        panic(err)
+    }
+    return 0 != count;
+}
+
 var findUserByNameSql = fmt.Sprintf("select * from %s where name=?", app.TABLE_USERS)
 func FindUserByName(dbmap *gorp.DbMap, name string) (u *models.User) {
     u = new(models.User)

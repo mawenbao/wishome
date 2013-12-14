@@ -32,15 +32,16 @@ func ValidateSignup(v *revel.Validation, dbmap *gorp.DbMap, name, email, passwor
     }
 
     // check name and email in db
-    result = ValidateDbName(v, name, dbmap)
+    result = ValidateDbNameNotExists(v, dbmap, name)
     if !result.Ok {
         return
     }
 
-    result = ValidateDbEmail(v, email, dbmap)
+    result = ValidateDbEmailNotExists(v, email, dbmap)
     return
 }
 
+// allow user who have not verified their email address to sigin in
 func ValidateSignin(v *revel.Validation, dbmap *gorp.DbMap, name, password string) (result *revel.ValidationResult, u *models.User) {
     result = ValidateName(v, name)
     if !result.Ok {
@@ -73,6 +74,12 @@ func ValidateResetPassNameEmail(v *revel.Validation, dbmap *gorp.DbMap, name, em
         return
     }
 
+    // make sure user has verified email address
+    result = ValidateDbEmailVerified(v, dbmap, name)
+    if !result.Ok {
+        return
+    }
+
     result = ValidateDbNameEmail(v, dbmap, name, email)
     return
 }
@@ -81,10 +88,18 @@ func ValidateName(v *revel.Validation, name string) *revel.ValidationResult {
     return v.Check(name, revel.Required{}, revel.MaxSize{15}, revel.MinSize{4}, revel.Match{USER_NAME_REGEX})
 }
 
-func ValidateDbName(v *revel.Validation, name string, dbmap *gorp.DbMap) *revel.ValidationResult {
-    // check name in db
+func ValidateDbNameNotExists(v *revel.Validation, dbmap *gorp.DbMap, name string) *revel.ValidationResult {
+    // name should not exists in db
     if database.IsNameExists(dbmap, name) {
         return v.Error("name already exists").Key(app.STR_NAME)
+    }
+    return &revel.ValidationResult{Ok: true}
+}
+
+func ValidateDbNameExists(v *revel.Validation, dbmap *gorp.DbMap, name string) *revel.ValidationResult {
+    // name should exists in db
+    if !database.IsNameExists(dbmap, name) {
+        return v.Error("name not exists").Key(app.STR_NAME)
     }
     return &revel.ValidationResult{Ok: true}
 }
@@ -93,8 +108,22 @@ func ValidateEmail(v *revel.Validation, email string) *revel.ValidationResult {
     return v.Check(email, revel.Required{}, revel.MaxSize{50}, revel.MinSize{6}, revel.Match{USER_EMAIL_REGEX})
 }
 
-func ValidateDbEmail(v *revel.Validation, email string, dbmap *gorp.DbMap) *revel.ValidationResult {
-    // check email in db
+func ValidateEmailVerified(v *revel.Validation, emailVerified bool) *revel.ValidationResult {
+    if !emailVerified {
+        return v.Error("your email address has not been verified").Key("email verify error")
+    }
+    return &revel.ValidationResult{Ok: true}
+}
+
+func ValidateDbEmailVerified(v *revel.Validation, dbmap *gorp.DbMap, name string) *revel.ValidationResult {
+    if !database.IsEmailVerified(dbmap, name) {
+        return v.Error("you have to verify your email address first").Key("email verify error")
+    }
+    return &revel.ValidationResult{Ok: true}
+}
+
+func ValidateDbEmailNotExists(v *revel.Validation, email string, dbmap *gorp.DbMap) *revel.ValidationResult {
+    // email should not exists in db
     if database.IsEmailExists(dbmap, email) {
         return v.Error("email already exists").Key(app.STR_EMAIL)
     }

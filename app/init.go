@@ -3,6 +3,9 @@ package app
 import (
     "log"
     "time"
+    "net"
+    "strings"
+    "strconv"
     "github.com/robfig/revel"
 )
 
@@ -33,23 +36,91 @@ func init() {
 // parse custom settings in app.conf and save in MyGlobal
 // parse failure will result in panic
 func parseCustomConfig() {
-    keyLen, found := revel.Config.Int(CONFIG_RESETPASS_KEY_LEN)
+    // parse app url, app.url must be set in app.conf file
+    appURL, found := revel.Config.String(CONFIG_APP_URL)
     if !found {
-        keyLen = 32
+        revel.ERROR.Panicf("%s not set in app.conf. This is required configuration which denotes the host/ip address of your wishome app.", CONFIG_APP_URL)
     } else {
-        MyGlobal[CONFIG_RESETPASS_KEY_LEN] = keyLen
+        MyGlobal[CONFIG_APP_URL] = strings.TrimRight(appURL, "/")
     }
 
-    keyLife, found := revel.Config.String(CONFIG_RESETPASS_KEY_LIFE)
+    // parse session lifetime
+    sessLife, found := revel.Config.String(CONFIG_SESSION_LIFE)
+    if !found {
+        MyGlobal[CONFIG_SESSION_LIFE] = 1 * time.Hour
+    } else {
+        sessLifeTime, err := time.ParseDuration(sessLife)
+        if nil != err {
+            revel.ERROR.Panicf("failed to parse %s in app.conf, value is %s", CONFIG_SESSION_LIFE, sessLife)
+        }
+        MyGlobal[CONFIG_SESSION_LIFE] = sessLifeTime
+    }
+
+    // parse reset password key length
+    rstKeyLen, found := revel.Config.Int(CONFIG_RESETPASS_KEY_LEN)
+    if !found {
+        MyGlobal[CONFIG_RESETPASS_KEY_LEN] = 32
+    } else {
+        MyGlobal[CONFIG_RESETPASS_KEY_LEN] = rstKeyLen
+    }
+
+    // parse reset password key cache expire time
+    rstKeyLife, found := revel.Config.String(CONFIG_RESETPASS_KEY_LIFE)
     if !found {
         MyGlobal[CONFIG_RESETPASS_KEY_LIFE] = time.Duration(30 * time.Minute)
     } else {
-        keyLifeTime, err := time.ParseDuration(keyLife)
+        keyLifeTime, err := time.ParseDuration(rstKeyLife)
         if nil != err {
-            revel.ERROR.Printf("failed to parse %s in app.conf", CONFIG_RESETPASS_KEY_LIFE)
-            panic("parse app.conf custom config failed")
+            revel.ERROR.Panicf("failed to parse %s in app.conf %s", CONFIG_RESETPASS_KEY_LIFE, rstKeyLife)
         }
         MyGlobal[CONFIG_RESETPASS_KEY_LIFE] = keyLifeTime
+    }
+
+    // parse user signup email confirmation key length
+    cfmKeyLen, found := revel.Config.Int(CONFIG_SIGNUP_KEY_LEN)
+    if !found {
+        MyGlobal[CONFIG_SIGNUP_KEY_LEN] = 32
+    } else {
+        MyGlobal[CONFIG_SIGNUP_KEY_LEN] = cfmKeyLen
+    }
+
+    // parse user signup email confirmation key expire time
+    cfmKeyLife, found := revel.Config.String(CONFIG_SIGNUP_KEY_LIFE)
+    if !found {
+        MyGlobal[CONFIG_SIGNUP_KEY_LIFE] = time.Duration(30 * time.Minute)
+    } else {
+        keyLifeTime, err := time.ParseDuration(cfmKeyLife)
+        if nil != err {
+            revel.ERROR.Panicf("failed to parse %s in app.conf %s", CONFIG_SIGNUP_KEY_LIFE, cfmKeyLife)
+        }
+        MyGlobal[CONFIG_SIGNUP_KEY_LIFE] = keyLifeTime
+    }
+
+    // parse mail smtp server address
+    smtpServer, found := revel.Config.String(CONFIG_MAIL_SMTP_ADDR)
+    if !found {
+        MyGlobal[CONFIG_MAIL_SMTP_ADDR] = "localhost:25"
+        MyGlobal[CONFIG_MAIL_SMTP_HOST] = "localhost"
+        MyGlobal[CONFIG_MAIL_SMTP_PORT] = 25
+    } else {
+        MyGlobal[CONFIG_MAIL_SMTP_ADDR] = smtpServer
+        host, port, err := net.SplitHostPort(smtpServer)
+        if nil != err {
+            revel.ERROR.Panicf("failed to split host:port from %s, value is %s", CONFIG_MAIL_SMTP_ADDR, smtpServer)
+        }
+        MyGlobal[CONFIG_MAIL_SMTP_HOST] = host
+        MyGlobal[CONFIG_MAIL_SMTP_PORT], err = strconv.Atoi(port)
+        if nil != err {
+            revel.ERROR.Panicf("failed to convert port string %s to int", port)
+        }
+    }
+
+    // parse mail sender
+    mailSender, found := revel.Config.String(CONFIG_MAIL_SENDER)
+    if !found {
+        MyGlobal[CONFIG_MAIL_SENDER] = "noreply@atime.me"
+    } else {
+        MyGlobal[CONFIG_MAIL_SENDER] = mailSender
     }
 }
 
