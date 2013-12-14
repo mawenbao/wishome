@@ -23,7 +23,7 @@ func (c User) setUserSession(u models.User) {
     c.Session[app.STR_KEY] = aesKey
 
     c.Session[app.STR_NAME] = u.Name
-    c.Session[app.STR_EMAIL] = common.AesEncrypt([]byte(u.Email), []byte(aesKey))
+    c.Session[app.STR_EMAIL] = common.EncodeToHexString(common.AesEncrypt([]byte(u.Email), []byte(aesKey)))
     /*
     c.Session[app.STR_KEY] = "abc"
     c.Session[app.STR_EMAIL] = u.Email
@@ -40,7 +40,7 @@ func (c User) getUserSession() (u *models.User) {
 
     u.Name = c.Session[app.STR_NAME]
     key := []byte(c.Session[app.STR_KEY])
-    u.Email = common.AesDecrypt([]byte(c.Session[app.STR_EMAIL]), key)
+    u.Email = string(common.AesDecrypt(common.DecodeHexString(c.Session[app.STR_EMAIL]), key))
     /*
     u.Email = c.Session[app.STR_EMAIL]
     */

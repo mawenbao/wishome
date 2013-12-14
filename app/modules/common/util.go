@@ -6,6 +6,7 @@ import (
     "crypto/aes"
     "crypto/cipher"
     "encoding/base64"
+    "encoding/hex"
     "fmt"
     "io"
     "github.com/robfig/revel"
@@ -41,7 +42,7 @@ func MD5Sum(source string) string {
 }
 
 // iv is saved in cipher string[:aes.BlockSize]
-func AesEncrypt(source, key []byte) string {
+func AesEncrypt(source, key []byte) []byte {
     block, err := aes.NewCipher(key)
     if nil != err {
         revel.ERROR.Printf("failed to create aes cipher: %s", err)
@@ -59,10 +60,10 @@ func AesEncrypt(source, key []byte) string {
     cfb := cipher.NewCFBEncrypter(block, iv)
     cfb.XORKeyStream(cipherStr[aes.BlockSize:], []byte(sourceStr))
 
-    return string(cipherStr)
+    return cipherStr
 }
 
-func AesDecrypt(source, key []byte) string {
+func AesDecrypt(source, key []byte) []byte {
     block, err := aes.NewCipher(key)
     if nil != err {
         revel.ERROR.Printf("failed to create aes cipher: %s", err)
@@ -71,7 +72,7 @@ func AesDecrypt(source, key []byte) string {
 
     if len(source) < aes.BlockSize {
         revel.ERROR.Printf("decrypt error: cipher string too short %s", source)
-        return ""
+        return []byte("")
     }
 
     iv := source[:aes.BlockSize]
@@ -79,7 +80,7 @@ func AesDecrypt(source, key []byte) string {
     cfb := cipher.NewCFBDecrypter(block, iv)
     cfb.XORKeyStream(cipherStr, cipherStr)
 
-    return string(DecodeBase64(string(cipherStr)))
+    return DecodeBase64(string(cipherStr))
 }
 
 func EncodeBase64(source []byte) string {
@@ -93,5 +94,18 @@ func DecodeBase64(source string) []byte {
         return []byte("")
     }
     return data
+}
+
+func EncodeToHexString(source []byte) string {
+    return hex.EncodeToString(source)
+}
+
+func DecodeHexString(source string) []byte {
+    target, err := hex.DecodeString(source)
+    if nil != err {
+        revel.ERROR.Printf("failed to decode hex string %s", source)
+        panic("decode hex string failed, check log")
+    }
+    return target
 }
 
