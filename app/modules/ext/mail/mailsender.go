@@ -14,15 +14,19 @@ func SendMail(to, subject string, content []byte) bool {
         revel.ERROR.Printf("failed to connect to smtp server %s: %s", app.MyGlobal[app.CONFIG_MAIL_SMTP_ADDR].(string), err)
         return false
     }
+    defer mailClient.Close()
 
-    // avoid error: x509: certificate signed by unknown authority
-    tlc := &tls.Config{
-        InsecureSkipVerify: true,
-        ServerName: app.MyGlobal[app.CONFIG_MAIL_SMTP_HOST].(string),
-    }
-    if err = mailClient.StartTLS(tlc); nil != err {
-        revel.ERROR.Printf("failed to start tls: %s", err)
-        return false
+    // check STARTTLS support
+    if ok, _ := mailClient.Extension("STARTTLS"); ok {
+        // avoid error: x509: certificate signed by unknown authority
+        tlc := &tls.Config{
+            InsecureSkipVerify: true,
+            ServerName: app.MyGlobal[app.CONFIG_MAIL_SMTP_HOST].(string),
+        }
+        if err = mailClient.StartTLS(tlc); nil != err {
+            revel.ERROR.Printf("failed to start tls: %s", err)
+            return false
+        }
     }
 
     mailClient.Mail(app.MyGlobal[app.CONFIG_MAIL_SENDER].(string))
