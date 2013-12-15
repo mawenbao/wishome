@@ -376,6 +376,14 @@ func (c User) DoVerifyEmail(name, key string) revel.Result {
         return c.Redirect(routes.User.Signin())
     }
 
+    // check if user signed in
+    nextPage := routes.User.Signin()
+    if u := c.getUserSession(); nil != u && u.IsSecured() {
+        nextPage = routes.User.Home()
+    } else {
+        c.Flash.Data[app.STR_NAME] = name
+    }
+
     // init db connection
     dbmgr := database.NewDbManager()
     if nil == dbmgr {
@@ -390,13 +398,13 @@ func (c User) DoVerifyEmail(name, key string) revel.Result {
         revel.ERROR.Printf("validation for name %s failed", name)
         c.Validation.Keep()
         c.FlashParams()
-        return c.Redirect(routes.User.Signin())
+        return c.Redirect(nextPage)
     }
 
     // check confirmation key first
     if !caching.CheckCachedSignupConfirmKey(name, key) {
         c.Flash.Error(c.Message("user.signup.key.error"))
-        return c.Redirect(routes.User.Signin())
+        return c.Redirect(nextPage)
     }
 
     // update user
@@ -404,25 +412,25 @@ func (c User) DoVerifyEmail(name, key string) revel.Result {
     if nil == u || !u.IsSecured() {
         revel.ERROR.Printf("invalid user in database %s", name)
         c.Flash.Error(c.Message("error.internal"))
-        return c.Redirect(routes.User.Signin())
+        return c.Redirect(nextPage)
     }
     if u.EmailVerified {
         revel.WARN.Printf("user %s's email address had been verified before", name)
-        return c.Redirect(routes.User.Signin())
+        return c.Redirect(nextPage)
     }
 
     u.EmailVerified = true
     if !database.UpdateUser(dbmgr.DbMap, *u) {
         revel.ERROR.Printf("failed to update user email verify status for %s", name)
         c.Flash.Error(c.Message("error.database"))
-        return c.Redirect(routes.User.Signin())
+        return c.Redirect(nextPage)
     }
     // reset user cache
     caching.SetUser(u)
 
     revel.INFO.Printf("user %s has verified email address successfully")
     c.Flash.Success(c.Message("misc.signup.notice.verify.succeeded"))
-    return c.Redirect(routes.User.Signin())
+    return c.Redirect(nextPage)
 }
 
 func (c User) Home() revel.Result {

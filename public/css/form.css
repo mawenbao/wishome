@@ -4,12 +4,6 @@ body {
     background-color: #eee;
 }
 
-.form-signin {
-    max-width: 330px;
-    padding: 15px;
-    margin: 0 auto;
-}
-
 .form-submit-row {
     margin-top: 10px;
 }
@@ -24,5 +18,9 @@ body {
 
 form label {
     font-size: 18px;
+}
+
+.form-signin input {
+    font-size: 20px;
 }
 

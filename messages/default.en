@@ -37,6 +37,7 @@ user.signup.key.error = wrong signup confirmation key
 user.signup.mail.verify.exist = you have already verified your email address
 user.signup.mail.resend = resend confirmation mail
 user.signup.mail.succeeded = we have sent an email to %s
+user.signup.mail.failed = failed to send email to %s
 user.signup.mail.subject = [wishome] Confirm your email address
 user.signup.mail.content = Click %s to confirm your email address. Note that this link is only valid in %.0f minutes.<br/>You have to verify your email address before signing in to wishome.
 user.signout.succeeded = signed out successfully
