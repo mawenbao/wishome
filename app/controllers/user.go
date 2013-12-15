@@ -137,7 +137,7 @@ func (c User) DoSignin(name, password string) revel.Result {
         c.emptyUserSession(name)
     }
 
-    _, user := validators.ValidateSignin(c.Validation, name, password)
+    _, user := validators.ValidateSignin(c.Controller, name, password)
     if c.Validation.HasErrors() {
         c.Validation.Keep()
         c.FlashParams()
@@ -164,7 +164,7 @@ func (c User) DoSignup(name, email, password string) revel.Result {
     }
 
     // validate input 
-    validators.ValidateSignup(c.Validation, user.Name, user.Email, user.Password)
+    validators.ValidateSignup(c.Controller, user.Name, user.Email, user.Password)
     if c.Validation.HasErrors() {
         c.Validation.Keep()
         c.FlashParams()
@@ -228,7 +228,7 @@ func (c User) ResetPass() revel.Result {
 // which is valid in half an hour
 func (c User) PreResetPass(name, email string) revel.Result {
     // validate name and email
-    validators.ValidateResetPassNameEmail(c.Validation, name, email)
+    validators.ValidateResetPassNameEmail(c.Controller, name, email)
     if c.Validation.HasErrors() {
         c.Validation.Keep()
         c.FlashParams()
@@ -256,7 +256,7 @@ func (c User) DoResetPass(name, password, key string) revel.Result {
     }
 
     // check password
-    validators.ValidatePassword(c.Validation, password)
+    validators.ValidatePassword(c.Controller, password)
     if c.Validation.HasErrors() {
         c.Validation.Keep()
         c.FlashParams()
@@ -320,7 +320,7 @@ func (c User) sendConfirmEmail(name, email string) bool {
 func (c User) ResendConfirmEmail() revel.Result {
     cu := c.getUserSession()
     if nil == cu || !cu.IsValid() {
-        c.Flash.Error(c.Message("error.need.signin"))
+        c.Flash.Error(c.Message("error.require.signin"))
         return c.Redirect(routes.User.Signin())
     }
 
@@ -353,8 +353,8 @@ func (c User) DoVerifyEmail(name, key string) revel.Result {
     }
 
     // check user name
-    validators.ValidateName(c.Validation, name)
-    validators.ValidateDbNameExists(c.Validation, name)
+    validators.ValidateName(c.Controller, name)
+    validators.ValidateDbNameExists(c.Controller, name)
     if c.Validation.HasErrors() {
         revel.ERROR.Printf("validation for name %s failed", name)
         c.Validation.Keep()
@@ -397,7 +397,7 @@ func (c User) DoVerifyEmail(name, key string) revel.Result {
 func (c User) Home() revel.Result {
     // check if user has signed in
     if cu := c.getUserSession(); nil == cu || !cu.IsValid() {
-        c.Flash.Error(c.Message("error.need.signin"))
+        c.Flash.Error(c.Message("error.require.signin"))
         return c.Redirect(routes.User.Signin())
     }
 

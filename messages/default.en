@@ -29,6 +29,8 @@ user.greeting.old = welcome back, %s
 user.signin.succeeded = signed in successfully
 user.signin.failed = error signing in
 user.signin.failed.mail.notverified = your email address has not been verified
+user.signin.error.password = wrong password
+user.signin.error.user = user not exists
 user.signup.succeeded = signed up successfully
 user.signup.failed = error signing up
 user.signup.failed.exist.name = user name already exists
@@ -50,6 +52,7 @@ user.resetpass.mail.content = Click %s to reset your password on wishome. Note t
 user.resetpass.key.error = wrong reset password key
 user.resetpass.succeeded = you have reset your password successfully 
 user.resetpass.failed = sorry, we failed to reset your password, please try again
+user.resetpass.error.mismatch = name and email do not match
 
 # misc
 misc.signup.notice = sign up
@@ -61,4 +64,4 @@ misc.resetpass.notice = forgot password
 # misc errors
 error.internal = internal error
 error.database = database error
-error.need.signin = please sign in first
+error.require.signin = please sign in first
