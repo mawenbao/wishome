@@ -48,7 +48,7 @@ func (c User) setUserSession(u *models.User) bool {
         return false
     }
 
-    expireTime := time.Now().Add(app.MyGlobal[app.CONFIG_SESSION_LIFE].(time.Duration))
+    expireTime := time.Now().Add(app.MyGlobal.Duration(app.CONFIG_SESSION_LIFE))
     aesKey := []byte(common.NewRawRandom(32)) // aes-256
     cipherName, ok := common.AesEncrypt([]byte(u.Name), aesKey)
     if !ok {
@@ -297,7 +297,7 @@ func (c User) sendResetPassEmail(name, email string) bool {
     return mail.SendMail(
         email,
         c.Message("user.resetpass.mail.subject"),
-        []byte(c.Message("user.resetpass.mail.content", resetPassUrl, app.MyGlobal[app.CONFIG_RESETPASS_KEY_LIFE].(time.Duration).Minutes())),
+        []byte(c.Message("user.resetpass.mail.content", resetPassUrl, app.MyGlobal.Duration(app.CONFIG_RESETPASS_KEY_LIFE).Minutes())),
     )
 }
 
@@ -312,7 +312,7 @@ func (c User) sendConfirmEmail(name, email string) bool {
     return mail.SendMail(
         email,
         c.Message("user.signup.mail.subject"),
-        []byte(c.Message("user.signup.mail.content", cfmURL, app.MyGlobal[app.CONFIG_SIGNUP_KEY_LIFE].(time.Duration).Minutes())),
+        []byte(c.Message("user.signup.mail.content", cfmURL, app.MyGlobal.Duration(app.CONFIG_SIGNUP_KEY_LIFE).Minutes())),
     )
 }
 

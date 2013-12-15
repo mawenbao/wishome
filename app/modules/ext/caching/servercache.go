@@ -65,14 +65,14 @@ func NewReadableKey(keyName string, keyLen int, expires time.Duration) string {
 }
 
 func NewResetPassKey(name string) string {
-    keyLen := app.MyGlobal[app.CONFIG_RESETPASS_KEY_LEN].(int)
-    keyLife := app.MyGlobal[app.CONFIG_RESETPASS_KEY_LIFE].(time.Duration)
+    keyLen := app.MyGlobal.Int(app.CONFIG_RESETPASS_KEY_LEN)
+    keyLife := app.MyGlobal.Duration(app.CONFIG_RESETPASS_KEY_LIFE)
     return NewReadableKey(GetResetPassKeyName(name), keyLen, keyLife)
 }
 
 func NewSignupConfirmKey(name string) string {
-    keyLen := app.MyGlobal[app.CONFIG_SIGNUP_KEY_LEN].(int)
-    keyLife := app.MyGlobal[app.CONFIG_SIGNUP_KEY_LIFE].(time.Duration)
+    keyLen := app.MyGlobal.Int(app.CONFIG_SIGNUP_KEY_LEN)
+    keyLife := app.MyGlobal.Duration(app.CONFIG_SIGNUP_KEY_LIFE)
     return NewReadableKey(GetSignupConfirmKeyName(name), keyLen, keyLife)
 }
 
@@ -88,7 +88,7 @@ func Remove(keyName string) bool {
 
 // set user in cache
 func SetUser(u *models.User) {
-    go cache.Set(u.Name, *u, app.MyGlobal[app.CONFIG_SESSION_LIFE].(time.Duration))
+    go cache.Set(u.Name, *u, app.MyGlobal.Duration(app.CONFIG_SESSION_LIFE))
 }
 
 // get user from cache

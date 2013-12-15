@@ -10,7 +10,21 @@ import (
 )
 
 // store global custom configuration in app.conf
-var MyGlobal map[string]interface{} = make(map[string]interface{})
+type MyGlobalConfig map[string]interface{}
+
+func (my MyGlobalConfig) String(key string) string {
+    return my[key].(string)
+}
+
+func (my MyGlobalConfig) Int(key string) int {
+    return my[key].(int)
+}
+
+func (my MyGlobalConfig) Duration(key string) time.Duration {
+    return my[key].(time.Duration)
+}
+
+var MyGlobal = make(MyGlobalConfig)
 
 func init() {
 	// Filters is the default set of global filters.
@@ -30,6 +44,7 @@ func init() {
     // set log flags
     log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 
+    // init my global
     revel.OnAppStart(parseDbConfig)
     revel.OnAppStart(parseCustomConfig)
 }
