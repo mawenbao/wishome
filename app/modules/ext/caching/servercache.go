@@ -104,9 +104,9 @@ func GetUser(name string) *models.User {
 
 // remove the old user from cache and get a new one from database
 // then save it in cache
-func ReloadUser(dbmgr *database.DbManager, name string) *models.User {
+func ReloadUser(name string) *models.User {
     Remove(name)
-    u := database.FindUserByName(dbmgr.DbMap, name)
+    u := database.FindUserByName(name)
     if nil != u && u.IsSecured() {
         SetUser(u)
         return u

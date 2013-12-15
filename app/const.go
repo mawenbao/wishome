@@ -27,8 +27,11 @@ const (
     CONFIG_MAIL_SMTP_PORT = "mail.smtp.port"
     CONFIG_MAIL_SENDER = "mail.sender"
     CONFIG_SESSION_LIFE = "session.life"
+    CONFIG_DB_DRIVER = "db.driver"
+    CONFIG_DB_SPEC = "db.spec"
 )
 
+// default settings
 var (
     DEFAULT_TIME_FORMAT = time.ANSIC
 )

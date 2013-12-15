@@ -30,7 +30,22 @@ func init() {
     // set log flags
     log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 
+    revel.OnAppStart(parseDbConfig)
     revel.OnAppStart(parseCustomConfig)
+}
+
+// parse db related config
+func parseDbConfig() {
+    if dbdriver, found := revel.Config.String("db.driver"); !found {
+        revel.ERROR.Panic("app.conf error: db.driver not defined")
+    } else {
+        MyGlobal[CONFIG_DB_DRIVER] = dbdriver
+    }
+    if dbspec, found := revel.Config.String("db.spec"); !found {
+        revel.ERROR.Panic("app.conf error: db.spec not defined")
+    } else {
+        MyGlobal[CONFIG_DB_SPEC] = dbspec
+    }
 }
 
 // parse custom settings in app.conf and save in MyGlobal

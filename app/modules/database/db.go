@@ -3,55 +3,49 @@ package database
 import (
     "fmt"
     "database/sql"
+    _ "github.com/go-sql-driver/mysql"
     "github.com/coopernurse/gorp"
     "github.com/robfig/revel"
     "github.com/mawenbao/wishome/app"
     "github.com/mawenbao/wishome/app/models"
-    _ "github.com/go-sql-driver/mysql"
 )
 
 var (
-    DbDriver string
-    DbSpec string
+    MyDbManager = DbManager{} // global db handle
 )
+
+func init() {
+    // init global db handle
+    revel.OnAppStart(func() {
+        if !MyDbManager.Init() {
+            revel.ERROR.Panicf("failed to init global db manager")
+        }
+    })
+}
 
 type DbManager struct {
     DbMap *gorp.DbMap
-}
-
-func InitDbConfig() {
-    var found bool
-    if DbDriver, found = revel.Config.String("db.driver"); !found {
-        revel.ERROR.Fatal("Config error: db.driver not defined")
-    }
-    if DbSpec, found = revel.Config.String("db.spec"); !found {
-        revel.ERROR.Fatal("Config error: db.spec not defined")
-    }
-
-}
-
-func NewDbManager() *DbManager {
-    dbmgr := new(DbManager)
-    if !dbmgr.Init() {
-        revel.ERROR.Printf("failed to init new db manager")
-        return nil
-    }
-    return dbmgr
 }
 
 func (dbmgr *DbManager) Init() bool {
     dbmgr.DbMap = &gorp.DbMap{Dialect: gorp.MySQLDialect{}}
     // add tables
     dbmgr.DbMap.AddTableWithName(models.User{}, app.TABLE_USERS).SetKeys(true, "id")
-    // open new db connection(pooled)
-    //dbmgr.DbMap.Db, err := sql.Open(DbDriver, DbSpec)
-    db, err := sql.Open(DbDriver, DbSpec)
+    // open db(pooled)
+    db, err := sql.Open(app.MyGlobal[app.CONFIG_DB_DRIVER].(string), app.MyGlobal[app.CONFIG_DB_SPEC].(string))
     if nil != err {
         revel.ERROR.Printf("failed to get a new database connection: %s", err)
         return false
     }
     dbmgr.DbMap.Db = db
     return true
+}
+
+func (dbmgr *DbManager) Db() *gorp.DbMap {
+    if nil == dbmgr || nil == dbmgr.DbMap {
+        revel.ERROR.Panicf("db manger has not been initialized")
+    }
+    return dbmgr.DbMap
 }
 
 func (dbmgr *DbManager) Close() bool {
@@ -68,8 +62,8 @@ func (dbmgr *DbManager) Close() bool {
 }
 
 var isNameExistsSql = fmt.Sprintf("select count(*) from %s where name=?", app.TABLE_USERS)
-func IsNameExists(dbmap *gorp.DbMap, name string) bool {
-    count, err := dbmap.SelectInt(isNameExistsSql, name)
+func IsNameExists(name string) bool {
+    count, err := MyDbManager.Db().SelectInt(isNameExistsSql, name)
     if nil != err {
         revel.ERROR.Printf("db query failed: %s", err)
         panic(err)
@@ -78,8 +72,8 @@ func IsNameExists(dbmap *gorp.DbMap, name string) bool {
 }
 
 var isEmailExistsSql = fmt.Sprintf("select count(*) from %s where email=?", app.TABLE_USERS)
-func IsEmailExists(dbmap *gorp.DbMap, email string) bool {
-    count, err := dbmap.SelectInt(isEmailExistsSql, email)
+func IsEmailExists(email string) bool {
+    count, err := MyDbManager.Db().SelectInt(isEmailExistsSql, email)
     if nil != err {
         revel.ERROR.Printf("db query failed: %s", err)
         panic(err)
@@ -88,8 +82,8 @@ func IsEmailExists(dbmap *gorp.DbMap, email string) bool {
 }
 
 var isNameEmailExistsSql = fmt.Sprintf("select count(*) from %s where name=? and email=?", app.TABLE_USERS)
-func IsNameEmailExists(dbmap *gorp.DbMap, name, email string) bool {
-    count, err := dbmap.SelectInt(isNameEmailExistsSql, name, email)
+func IsNameEmailExists(name, email string) bool {
+    count, err := MyDbManager.Db().SelectInt(isNameEmailExistsSql, name, email)
     if nil != err {
         revel.ERROR.Printf("db query failed: %s", err)
         panic(err)
@@ -98,8 +92,8 @@ func IsNameEmailExists(dbmap *gorp.DbMap, name, email string) bool {
 }
 
 var isEmailVerifiedSql = fmt.Sprintf("select count(*) from %s where name=? and email_verified!=0", app.TABLE_USERS)
-func IsEmailVerified(dbmap *gorp.DbMap, name string) bool {
-    count, err := dbmap.SelectInt(isEmailVerifiedSql, name)
+func IsEmailVerified(name string) bool {
+    count, err := MyDbManager.Db().SelectInt(isEmailVerifiedSql, name)
     if nil != err {
         revel.ERROR.Printf("db query failed: %s", err)
         panic(err)
@@ -108,9 +102,9 @@ func IsEmailVerified(dbmap *gorp.DbMap, name string) bool {
 }
 
 var findUserByNameSql = fmt.Sprintf("select * from %s where name=?", app.TABLE_USERS)
-func FindUserByName(dbmap *gorp.DbMap, name string) (u *models.User) {
+func FindUserByName(name string) (u *models.User) {
     u = new(models.User)
-    err := dbmap.SelectOne(u, findUserByNameSql, name)
+    err := MyDbManager.Db().SelectOne(u, findUserByNameSql, name)
     if nil != err {
         revel.ERROR.Fatalf("failed to select user by name %s: %s", name, err)
         return nil
@@ -119,9 +113,9 @@ func FindUserByName(dbmap *gorp.DbMap, name string) (u *models.User) {
 }
 
 var findUserByEmailSql = fmt.Sprintf("select * from %s where email=?", app.TABLE_USERS)
-func FindUserByEmail(dbmap *gorp.DbMap, email string) (u *models.User) {
+func FindUserByEmail(email string) (u *models.User) {
     u = new(models.User)
-    err := dbmap.SelectOne(u, findUserByEmailSql, email)
+    err := MyDbManager.Db().SelectOne(u, findUserByEmailSql, email)
     if nil != err {
         revel.ERROR.Printf("failed to select user by email %s: %s", email, err)
         return nil
@@ -130,9 +124,9 @@ func FindUserByEmail(dbmap *gorp.DbMap, email string) (u *models.User) {
 }
 
 var findUserByIDSql = fmt.Sprintf("select * from %s where id=?", app.TABLE_USERS)
-func FindUserByID(dbmap *gorp.DbMap, id int32) (u *models.User) {
+func FindUserByID(id int32) (u *models.User) {
     u = new(models.User)
-    err := dbmap.SelectOne(u, findUserByIDSql, id)
+    err := MyDbManager.Db().SelectOne(u, findUserByIDSql, id)
     if nil != err {
         revel.ERROR.Printf("failed to select user by id %d: %s", id, err)
         return nil
@@ -140,8 +134,8 @@ func FindUserByID(dbmap *gorp.DbMap, id int32) (u *models.User) {
     return
 }
 
-func SaveUser(dbmap *gorp.DbMap, u models.User) bool {
-    err := dbmap.Insert(&u)
+func SaveUser(u models.User) bool {
+    err := MyDbManager.Db().Insert(&u)
     if nil != err {
         revel.ERROR.Printf("failed to insert user %s: %s", u, err)
         return false
@@ -149,8 +143,8 @@ func SaveUser(dbmap *gorp.DbMap, u models.User) bool {
     return true
 }
 
-func UpdateUser(dbmap *gorp.DbMap, u models.User) bool {
-    count, err := dbmap.Update(&u)
+func UpdateUser(u models.User) bool {
+    count, err := MyDbManager.Db().Update(&u)
     if nil != err {
         revel.ERROR.Printf("failed to update user %s: %s", u, err)
         return false
@@ -162,8 +156,8 @@ func UpdateUser(dbmap *gorp.DbMap, u models.User) bool {
 }
 
 // remove user by id
-func RemoveUser(dbmap *gorp.DbMap, u models.User) bool {
-    count, err := dbmap.Delete(&u)
+func RemoveUser(u models.User) bool {
+    count, err := MyDbManager.Db().Delete(&u)
     if nil != err {
         revel.ERROR.Printf("failed to delete user %s: %s", u, err)
         return false

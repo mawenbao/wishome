@@ -109,13 +109,7 @@ func (c User) getUserSession() (u *models.User) {
     u = caching.GetUser(name)
     if nil == u || !u.IsSecured() {
         // cache missed, session valid, try to reload user cache from database
-        // aquire a new db connection
-        dbmgr := database.NewDbManager()
-        if nil == dbmgr {
-            panic("db error: failed to init")
-        }
-        defer dbmgr.Close()
-        u = caching.ReloadUser(dbmgr, name)
+        u = caching.ReloadUser(name)
         if nil == u || !u.IsSecured() {
             revel.ERROR.Printf("failed to reload user cache for %s", name)
             return nil
@@ -143,13 +137,7 @@ func (c User) DoSignin(name, password string) revel.Result {
         c.emptyUserSession(name)
     }
 
-    dbmgr := database.NewDbManager()
-    if nil == dbmgr {
-        panic("db error: failed to init")
-    }
-    defer dbmgr.Close()
-
-    _, user := validators.ValidateSignin(c.Validation, dbmgr.DbMap, name, password)
+    _, user := validators.ValidateSignin(c.Validation, name, password)
     if c.Validation.HasErrors() {
         c.Validation.Keep()
         c.FlashParams()
@@ -174,15 +162,9 @@ func (c User) DoSignup(name, email, password string) revel.Result {
         EmailVerified: false,
         Password: password,
     }
-    // init db connection
-    dbmgr := database.NewDbManager()
-    if nil == dbmgr {
-        panic("db error: failed to init")
-    }
-    defer dbmgr.Close()
 
     // validate input 
-    validators.ValidateSignup(c.Validation, dbmgr.DbMap, user.Name, user.Email, user.Password)
+    validators.ValidateSignup(c.Validation, user.Name, user.Email, user.Password)
     if c.Validation.HasErrors() {
         c.Validation.Keep()
         c.FlashParams()
@@ -196,7 +178,7 @@ func (c User) DoSignup(name, email, password string) revel.Result {
     go c.sendConfirmEmail(name, email)
 
     // save user in database
-    if !database.SaveUser(dbmgr.DbMap, user) {
+    if !database.SaveUser(user) {
         c.Flash.Error(c.Message("user.save.error.db"))
         return c.Redirect(routes.User.Signup())
     } else {
@@ -245,15 +227,8 @@ func (c User) ResetPass() revel.Result {
 // validate name, email and send an email to user with a random key
 // which is valid in half an hour
 func (c User) PreResetPass(name, email string) revel.Result {
-    // init db connection
-    dbmgr := database.NewDbManager()
-    if nil == dbmgr {
-        panic("db error: failed to init")
-    }
-    defer dbmgr.Close()
-
     // validate name and email
-    validators.ValidateResetPassNameEmail(c.Validation, dbmgr.DbMap, name, email)
+    validators.ValidateResetPassNameEmail(c.Validation, name, email)
     if c.Validation.HasErrors() {
         c.Validation.Keep()
         c.FlashParams()
@@ -288,14 +263,7 @@ func (c User) DoResetPass(name, password, key string) revel.Result {
         return c.Redirect(routes.User.PostResetPass(name, key))
     }
 
-    // init db connection
-    dbmgr := database.NewDbManager()
-    if nil == dbmgr {
-        panic("db error: failed to init")
-    }
-    defer dbmgr.Close()
-
-    u := database.FindUserByName(dbmgr.DbMap, name)
+    u := database.FindUserByName(name)
     if nil == u || !u.IsSecured() {
         c.Flash.Error(c.Message("common.user.none", name))
         return c.Redirect(routes.User.Signin())
@@ -304,7 +272,7 @@ func (c User) DoResetPass(name, password, key string) revel.Result {
     // change password and password salt
     u.Password = password
     u.EncryptPass()
-    if !database.UpdateUser(dbmgr.DbMap, *u) {
+    if !database.UpdateUser(*u) {
         revel.ERROR.Printf("failed to update user password for %s", u)
         c.Flash.Error(c.Message("user.resetpass.failed"))
         return c.Redirect(routes.User.ResetPass())
@@ -384,16 +352,9 @@ func (c User) DoVerifyEmail(name, key string) revel.Result {
         c.Flash.Data[app.STR_NAME] = name
     }
 
-    // init db connection
-    dbmgr := database.NewDbManager()
-    if nil == dbmgr {
-        panic("db error: failed to init")
-    }
-    defer dbmgr.Close()
-
     // check user name
     validators.ValidateName(c.Validation, name)
-    validators.ValidateDbNameExists(c.Validation, dbmgr.DbMap, name)
+    validators.ValidateDbNameExists(c.Validation, name)
     if c.Validation.HasErrors() {
         revel.ERROR.Printf("validation for name %s failed", name)
         c.Validation.Keep()
@@ -408,7 +369,7 @@ func (c User) DoVerifyEmail(name, key string) revel.Result {
     }
 
     // update user
-    u := database.FindUserByName(dbmgr.DbMap, name)
+    u := database.FindUserByName(name)
     if nil == u || !u.IsSecured() {
         revel.ERROR.Printf("invalid user in database %s", name)
         c.Flash.Error(c.Message("error.internal"))
@@ -420,7 +381,7 @@ func (c User) DoVerifyEmail(name, key string) revel.Result {
     }
 
     u.EmailVerified = true
-    if !database.UpdateUser(dbmgr.DbMap, *u) {
+    if !database.UpdateUser(*u) {
         revel.ERROR.Printf("failed to update user email verify status for %s", name)
         c.Flash.Error(c.Message("error.database"))
         return c.Redirect(nextPage)
