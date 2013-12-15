@@ -4,7 +4,7 @@ body {
     background-color: #eee;
 }
 
-.form-submit-row {
+.form-separate-row {
     margin-top: 10px;
 }
 
@@ -22,5 +22,9 @@ form label {
 
 .form-signin input {
     font-size: 20px;
+}
+
+.form-signin button {
+    margin-top: 7px;
 }
 

@@ -3,30 +3,26 @@
 <div class="container">
     <div class="row">
         <div class="col-md-4 col-md-offset-4"> 
-            <h2 class="main-heading">Please sign in</h2>
-            {{template "flash.html" .}}
+            <div class="row">
+                <h2 class="main-heading">Please sign in</h2>
+                {{template "flash.html" .}}
+            </div>
         </div>
     </div>
     <div class="row">
         <div class="col-md-4 col-md-offset-4">
             <form class="form-signin form-horizontal" role="form" action="/user/dosignin" method="post">
-                <input name="name" class="form-control" placeholder="{{msg . "form.signin.name"}}" required {{with .name}}value="{{.}}"{{else}}autofocus{{end}}>
-                <input name="password" type="password" class="form-control" placeholder="{{msg . "form.signup.password"}}" required {{with .name}}autofocus{{end}}>
-                <div class="row form-submit-row">
-                    <div class="col-md-6">
-                        <button class="btn btn-lg btn-primary btn-block" type="submit">{{msg . "form.signin.submit"}}</button>
+                <div class="row">
+                    <input name="name" class="form-control" placeholder="{{msg . "form.signin.name"}}" required {{with .name}}value="{{.}}"{{else}}autofocus{{end}}>
+                    <input name="password" type="password" class="form-control" placeholder="{{msg . "form.signup.password"}}" required {{with .name}}autofocus{{end}}>
+                    <button class="btn btn-lg btn-primary btn-block" type="submit">{{msg . "form.signin.submit"}}</button>
+                </div>
+                <div class="form-separate-row">
+                    <div class="row">
+                        <a class="pull-right text-right" href="/user/signup">{{msg . "misc.signup.notice"}}</a>
                     </div>
-                    <div class="col-md-6">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <a class="pull-right text-right" href="/user/signup">{{msg . "misc.signup.notice"}}</a>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <a class="pull-right text-right" href="/user/resetpass">{{msg . "misc.resetpass.notice"}}</a>
-                            </div>
-                        </div>
+                    <div class="row">
+                        <a class="pull-right text-right" href="/user/resetpass">{{msg . "misc.resetpass.notice"}}</a>
                     </div>
                 </div>
             </form>
