@@ -12,8 +12,9 @@ const (
     STR_KEY = "key"
     STR_EXPIRE = "expire"
 
-    CACHE_RESETPASS = "reset_pass_"
-    CACHE_SIGNUP_CONFIRM = "signup_confirm_"
+    CACHE_RESETPASS = "reset_pass"
+    CACHE_SIGNUP_CONFIRM = "signup_confirm"
+    CACHE_SIGNIN_ERROR = "signin_err_sess"
 
     TABLE_USERS = "users"
 

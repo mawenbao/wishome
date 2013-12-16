@@ -7,6 +7,7 @@ import (
     "github.com/mawenbao/wishome/app/models"
     "github.com/mawenbao/wishome/app/modules/database"
     "github.com/mawenbao/wishome/app/modules/common"
+    "github.com/mawenbao/wishome/app/modules/ext/caching"
 )
 
 var (
@@ -55,10 +56,14 @@ func ValidateSignin(c *revel.Controller, name, password string) (result *revel.V
 
     result = ValidatePassword(c, password)
     if !result.Ok {
+        caching.NewSigninError(name)
         return result, nil
     }
 
     result = ValidateDbPassword(c, password, u)
+    if !result.Ok {
+        caching.NewSigninError(name)
+    }
     return
 }
 

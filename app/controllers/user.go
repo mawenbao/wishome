@@ -11,6 +11,7 @@ import (
     "github.com/mawenbao/wishome/app/modules/validators"
     "github.com/mawenbao/wishome/app/modules/ext/caching"
     "github.com/mawenbao/wishome/app/modules/ext/mail"
+    "github.com/mawenbao/wishome/app/modules/ext/captcha"
     "github.com/mawenbao/wishome/app/routes"
 )
 
@@ -133,10 +134,18 @@ func (c User) emptyUserSession(name string) {
 }
 
 func (c User) DoSignin(name, password string) revel.Result {
-    if uc :=  c.getUserSession(); nil != uc {
+    // check user signin error type and times
+    if caching.IsSigninBanned(name) {
+        c.Flash.Error(c.Message("user.signin.error.banned", caching.SIGNIN_SESSION_LIFE))
+        c.Flash.Data[app.STR_NAME] = name
+        return c.Redirect(routes.User.Signin())
+    }
+
+    if uc := c.getUserSession(); nil != uc {
         c.emptyUserSession(name)
     }
 
+    // check user, password and set signin error
     _, user := validators.ValidateSignin(c.Controller, name, password)
     if c.Validation.HasErrors() {
         c.Validation.Keep()
@@ -206,7 +215,13 @@ func (c User) Signin() revel.Result {
 
     // get user name, may be empty
     name := c.Flash.Data[app.STR_NAME]
-    return c.Render(name)
+
+    captchaID := ""
+    if caching.IsSigninCaptchaRequired(name) {
+        captchaID = captcha.SigninCaptcha(name)
+    }
+
+    return c.Render(name, captchaID)
 }
 
 func (c User) Signup() revel.Result {
@@ -389,7 +404,7 @@ func (c User) DoVerifyEmail(name, key string) revel.Result {
     // reset user cache
     caching.SetUser(u)
 
-    revel.INFO.Printf("user %s has verified email address successfully")
+    revel.INFO.Printf("user %s has verified email address successfully", name)
     c.Flash.Success(c.Message("misc.signup.notice.verify.succeeded"))
     return c.Redirect(nextPage)
 }
@@ -406,4 +421,15 @@ func (c User) Home() revel.Result {
     }
     return c.Render(moreNavbarLinks)
 }
+
+/*
+// reload captcha by id and return its url
+func (c User) ReloadCaptcha(captchaID string) revel.Result {
+    if !captcha.ReloadCaptcha(captcharID) {
+        revel.ERROR.Printf("failed to reload catpcha id %s", captchaID)
+    }
+
+    return c.RenderText("/captcha/%s.png", captcharID)
+}
+*/
 

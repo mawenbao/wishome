@@ -31,6 +31,7 @@ user.signin.failed = error signing in
 user.signin.failed.mail.notverified = your email address has not been verified
 user.signin.error.password = wrong password
 user.signin.error.user = user not exists
+user.signin.error.banned = too much errors, you are not allowed to sign in in %s
 user.signup.succeeded = signed up successfully
 user.signup.failed = error signing up
 user.signup.failed.exist.name = user name already exists
