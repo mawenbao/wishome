@@ -66,3 +66,5 @@ misc.resetpass.notice = forgot password
 error.internal = internal error
 error.database = database error
 error.require.signin = please sign in first
+error.require.captcha = please entrer the captcha
+error.captcha = wrong captcha

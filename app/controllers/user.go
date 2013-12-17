@@ -133,7 +133,23 @@ func (c User) emptyUserSession(name string) {
     caching.Remove(name)
 }
 
-func (c User) DoSignin(name, password string) revel.Result {
+func (c User) checkCaptcha(captchaid, captchaval string) bool {
+    if "" == captchaid || "" == captchaval {
+        c.Flash.Error(c.Message("error.require.captcha"))
+        return false
+    }
+    if !captcha.VerifyCaptchaString(captchaid, captchaval) {
+        c.Flash.Error(c.Message("error.captcha"))
+        return false
+    }
+    return true
+}
+
+func (c User) DoSignin(name, password, captchaid, captchaval string) revel.Result {
+    if uc := c.getUserSession(); nil != uc {
+        c.emptyUserSession(name)
+    }
+
     // check user signin error type and times
     if caching.IsSigninBanned(name) {
         c.Flash.Error(c.Message("user.signin.error.banned", caching.SIGNIN_SESSION_LIFE))
@@ -141,8 +157,10 @@ func (c User) DoSignin(name, password string) revel.Result {
         return c.Redirect(routes.User.Signin())
     }
 
-    if uc := c.getUserSession(); nil != uc {
-        c.emptyUserSession(name)
+    // check captcha
+    if !c.checkCaptcha(captchaid, captchaval) {
+        c.Flash.Data[app.STR_NAME] = name
+        return c.Redirect(routes.User.Signin())
     }
 
     // check user, password and set signin error
@@ -159,10 +177,15 @@ func (c User) DoSignin(name, password string) revel.Result {
     return c.Redirect(routes.User.Home())
 }
 
-func (c User) DoSignup(name, email, password string) revel.Result {
+func (c User) DoSignup(name, email, password, captchaid, captchaval string) revel.Result {
     // check if user has signed in already, if so, sign him out
     if nil != c.getUserSession() {
         c.emptyUserSession(name)
+    }
+
+    // check captcha
+    if !c.checkCaptcha(captchaid, captchaval) {
+        return c.Redirect(routes.User.Signup())
     }
 
     user := models.User{
@@ -216,12 +239,7 @@ func (c User) Signin() revel.Result {
     // get user name, may be empty
     name := c.Flash.Data[app.STR_NAME]
 
-    captchaID := ""
-    if caching.IsSigninCaptchaRequired(name) {
-        captchaID = captcha.SigninCaptcha(name)
-    }
-
-    return c.Render(name, captchaID)
+    return c.Render(name)
 }
 
 func (c User) Signup() revel.Result {
@@ -241,7 +259,12 @@ func (c User) ResetPass() revel.Result {
 
 // validate name, email and send an email to user with a random key
 // which is valid in half an hour
-func (c User) PreResetPass(name, email string) revel.Result {
+func (c User) PreResetPass(name, email, captchaid, captchaval string) revel.Result {
+    // check captcha
+    if !c.checkCaptcha(captchaid, captchaval) {
+        return c.Redirect(routes.User.ResetPass())
+    }
+
     // validate name and email
     validators.ValidateResetPassNameEmail(c.Controller, name, email)
     if c.Validation.HasErrors() {
@@ -262,7 +285,7 @@ func (c User) PostResetPass(name, key string) revel.Result {
     return c.Render(name, key)
 }
 
-func (c User) DoResetPass(name, password, key string) revel.Result {
+func (c User) DoResetPass(name, password, key, captchaid, captchaval string) revel.Result {
     revel.TRACE.Printf("doresetpass got key %s for name %s", key, name)
     // check key first
     if !caching.CheckCachedResetPassKey(name, key) {
@@ -421,15 +444,4 @@ func (c User) Home() revel.Result {
     }
     return c.Render(moreNavbarLinks)
 }
-
-/*
-// reload captcha by id and return its url
-func (c User) ReloadCaptcha(captchaID string) revel.Result {
-    if !captcha.ReloadCaptcha(captcharID) {
-        revel.ERROR.Printf("failed to reload catpcha id %s", captchaID)
-    }
-
-    return c.RenderText("/captcha/%s.png", captcharID)
-}
-*/
 
