@@ -28,12 +28,17 @@ const (
     CONFIG_MAIL_SMTP_HOST = "mail.smtp.host"
     CONFIG_MAIL_SMTP_PORT = "mail.smtp.port"
     CONFIG_MAIL_SENDER = "mail.sender"
-    CONFIG_SESSION_LIFE = "session.life"
     CONFIG_DB_DRIVER = "db.driver"
     CONFIG_DB_SPEC = "db.spec"
     CONFIG_CAPTCHA_WIDTH = "captcha.width"
     CONFIG_CAPTCHA_HEIGHT = "captcha.height"
     CONFIG_CAPTCHA_LENGTH = "captcha.length"
+    // client side cookie life
+    CONFIG_SESSION_LIFE = "session.life"
+    // server side session cache
+    CONFIG_SIGNIN_CACHE_LIFE = "session.signin.life"
+    CONFIG_SIGNIN_USECAPTCHA = "user.signin.usecaptcha"
+    CONFIG_SIGNIN_ERROR_LIMIT = "session.error.limit"
 )
 
 // default settings

@@ -4,7 +4,6 @@ import (
     "log"
     "time"
     "net"
-    "strings"
     "strconv"
     "github.com/robfig/revel"
 )
@@ -67,12 +66,11 @@ func parseDbConfig() {
 // parse failure will result in panic
 func parseCustomConfig() {
     var err error
+    var found bool
     // parse app url, app.url must be set in app.conf file
-    appURL, found := revel.Config.String(CONFIG_APP_URL)
+    MyGlobal[CONFIG_APP_URL], found = revel.Config.String(CONFIG_APP_URL)
     if !found {
         revel.ERROR.Panicf("%s not set in app.conf. This is required configuration which denotes the host/ip address of your wishome app.", CONFIG_APP_URL)
-    } else {
-        MyGlobal[CONFIG_APP_URL] = strings.TrimRight(appURL, "/")
     }
 
     // parse session lifetime
@@ -80,19 +78,16 @@ func parseCustomConfig() {
     if !found {
         MyGlobal[CONFIG_SESSION_LIFE] = 1 * time.Hour
     } else {
-        sessLifeTime, err := time.ParseDuration(sessLife)
+        MyGlobal[CONFIG_SESSION_LIFE], err = time.ParseDuration(sessLife)
         if nil != err {
             revel.ERROR.Panicf("failed to parse %s in app.conf, value is %s", CONFIG_SESSION_LIFE, sessLife)
         }
-        MyGlobal[CONFIG_SESSION_LIFE] = sessLifeTime
     }
 
     // parse reset password key length
-    rstKeyLen, found := revel.Config.Int(CONFIG_RESETPASS_KEY_LEN)
+    MyGlobal[CONFIG_RESETPASS_KEY_LEN], found = revel.Config.Int(CONFIG_RESETPASS_KEY_LEN)
     if !found {
         MyGlobal[CONFIG_RESETPASS_KEY_LEN] = 32
-    } else {
-        MyGlobal[CONFIG_RESETPASS_KEY_LEN] = rstKeyLen
     }
 
     // parse reset password key cache expire time
@@ -100,19 +95,16 @@ func parseCustomConfig() {
     if !found {
         MyGlobal[CONFIG_RESETPASS_KEY_LIFE] = time.Duration(30 * time.Minute)
     } else {
-        keyLifeTime, err := time.ParseDuration(rstKeyLife)
+        MyGlobal[CONFIG_RESETPASS_KEY_LIFE], err = time.ParseDuration(rstKeyLife)
         if nil != err {
             revel.ERROR.Panicf("failed to parse %s in app.conf %s", CONFIG_RESETPASS_KEY_LIFE, rstKeyLife)
         }
-        MyGlobal[CONFIG_RESETPASS_KEY_LIFE] = keyLifeTime
     }
 
     // parse user signup email confirmation key length
-    cfmKeyLen, found := revel.Config.Int(CONFIG_SIGNUP_KEY_LEN)
+    MyGlobal[CONFIG_SIGNUP_KEY_LEN], found = revel.Config.Int(CONFIG_SIGNUP_KEY_LEN)
     if !found {
         MyGlobal[CONFIG_SIGNUP_KEY_LEN] = 32
-    } else {
-        MyGlobal[CONFIG_SIGNUP_KEY_LEN] = cfmKeyLen
     }
 
     // parse user signup email confirmation key expire time
@@ -120,11 +112,10 @@ func parseCustomConfig() {
     if !found {
         MyGlobal[CONFIG_SIGNUP_KEY_LIFE] = time.Duration(30 * time.Minute)
     } else {
-        keyLifeTime, err := time.ParseDuration(cfmKeyLife)
+        MyGlobal[CONFIG_SIGNUP_KEY_LIFE], err = time.ParseDuration(cfmKeyLife)
         if nil != err {
             revel.ERROR.Panicf("failed to parse %s in app.conf %s", CONFIG_SIGNUP_KEY_LIFE, cfmKeyLife)
         }
-        MyGlobal[CONFIG_SIGNUP_KEY_LIFE] = keyLifeTime
     }
 
     // parse mail smtp server address
@@ -147,40 +138,44 @@ func parseCustomConfig() {
     }
 
     // parse mail sender
-    mailSender, found := revel.Config.String(CONFIG_MAIL_SENDER)
+    MyGlobal[CONFIG_MAIL_SENDER], found = revel.Config.String(CONFIG_MAIL_SENDER)
     if !found {
         MyGlobal[CONFIG_MAIL_SENDER] = "noreply@atime.me"
-    } else {
-        MyGlobal[CONFIG_MAIL_SENDER] = mailSender
     }
 
     // parse captcha
-    captchaLen, found := revel.Config.String(CONFIG_CAPTCHA_LENGTH)
+    MyGlobal[CONFIG_CAPTCHA_LENGTH], found = revel.Config.Int(CONFIG_CAPTCHA_LENGTH)
     if !found {
         MyGlobal[CONFIG_CAPTCHA_LENGTH] = 6
-    } else {
-        MyGlobal[CONFIG_CAPTCHA_LENGTH], err = strconv.Atoi(captchaLen)
-        if nil != err {
-            revel.ERROR.Panicf("failed to convert captcha length %s to int", captchaLen)
-        }
     }
-    captchaWidth, found := revel.Config.String(CONFIG_CAPTCHA_WIDTH)
+    MyGlobal[CONFIG_CAPTCHA_WIDTH], found = revel.Config.Int(CONFIG_CAPTCHA_WIDTH)
     if !found {
         MyGlobal[CONFIG_CAPTCHA_WIDTH] = 100
-    } else {
-        MyGlobal[CONFIG_CAPTCHA_WIDTH], err = strconv.Atoi(captchaWidth)
-        if nil != err {
-            revel.ERROR.Panicf("failed to convert captcha width %s to int", captchaWidth)
-        }
     }
-    captchaHeight, found := revel.Config.String(CONFIG_CAPTCHA_HEIGHT)
+    MyGlobal[CONFIG_CAPTCHA_HEIGHT], found = revel.Config.Int(CONFIG_CAPTCHA_HEIGHT)
     if !found {
         MyGlobal[CONFIG_CAPTCHA_HEIGHT] = 40
+    }
+
+    // server side session cache
+    sessLifeSignin, found := revel.Config.String(CONFIG_SIGNIN_CACHE_LIFE)
+    if !found {
+        MyGlobal[CONFIG_SIGNIN_CACHE_LIFE] = time.Duration(1 * time.Hour)
     } else {
-        MyGlobal[CONFIG_CAPTCHA_HEIGHT], err = strconv.Atoi(captchaHeight)
+        MyGlobal[CONFIG_SIGNIN_CACHE_LIFE], err = time.ParseDuration(sessLifeSignin)
         if nil != err {
-            revel.ERROR.Panicf("failed to convert captcha height %s to int", captchaHeight)
+            revel.ERROR.Panicf("failed to parse %s as duration, value is %s", CONFIG_SIGNIN_CACHE_LIFE, sessLifeSignin)
         }
+    }
+    MyGlobal[CONFIG_SIGNIN_ERROR_LIMIT], found = revel.Config.Int(CONFIG_SIGNIN_ERROR_LIMIT)
+    if !found {
+        MyGlobal[CONFIG_SIGNIN_ERROR_LIMIT] = 30
+    }
+
+    // after some signin errors, user should enter captcha to continue signing in
+    MyGlobal[CONFIG_SIGNIN_USECAPTCHA], found = revel.Config.Int(CONFIG_SIGNIN_USECAPTCHA)
+    if !found {
+        MyGlobal[CONFIG_SIGNIN_USECAPTCHA] = 5
     }
 }
 

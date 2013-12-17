@@ -13,7 +13,7 @@ var (
     SIGNIN_ERROR_LIMIT = 50
 )
 
-type SigninErrorSession struct {
+type SigninErrorCache struct {
     Name string
     ErrorCount int
     CaptchaRequired bool
@@ -24,8 +24,8 @@ func GetSigninErrorKeyName(name string) string {
     return name + "." + app.CACHE_SIGNIN_ERROR
 }
 
-func GetSigninError(name string) *SigninErrorSession {
-    sess := new(SigninErrorSession)
+func GetSigninError(name string) *SigninErrorCache {
+    sess := new(SigninErrorCache)
     err := cache.Get(GetSigninErrorKeyName(name), sess)
     if nil != err {
         revel.INFO.Printf("error get signin error from cache for %s: %s", name, err)
@@ -51,11 +51,11 @@ func IsSigninBanned(name string) bool {
 }
 
 // new user signin error
-func NewSigninError(name string) *SigninErrorSession {
+func NewSigninError(name string) *SigninErrorCache {
     sess := GetSigninError(name)
     if nil == sess {
         // save new temp session in cache
-        sess = &SigninErrorSession{
+        sess = &SigninErrorCache{
             Name: name,
             ErrorCount: 1,
             Banned: false,
@@ -63,15 +63,15 @@ func NewSigninError(name string) *SigninErrorSession {
     } else {
         // update cache
         sess.ErrorCount += 1
-        if sess.ErrorCount >= SIGNIN_CAPCHAR_LIMIT {
+        if sess.ErrorCount >= app.MyGlobal.Int(app.CONFIG_SIGNIN_USECAPTCHA) {
             sess.CaptchaRequired = true
         }
-        if sess.ErrorCount >= SIGNIN_ERROR_LIMIT {
+        if sess.ErrorCount >= app.MyGlobal.Int(app.CONFIG_SIGNIN_ERROR_LIMIT) {
             sess.Banned = true
         }
     }
 
-    go cache.Set(GetSigninErrorKeyName(name), *sess, SIGNIN_SESSION_LIFE)
+    go cache.Set(GetSigninErrorKeyName(name), *sess, app.MyGlobal.Duration(app.CONFIG_SIGNIN_CACHE_LIFE))
     return sess
 }
 
