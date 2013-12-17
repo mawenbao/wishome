@@ -27,13 +27,14 @@ func (c Captcha) GetCaptchaImage(id string) revel.Result {
 }
 
 // reload captcha by id and return its url
-func (c Captcha) GetCaptcha(captchaID string) revel.Result {
-    capResult := new (CaptchaResult)
-    if "" == captchaID {
+func (c Captcha) GetCaptcha(captchaid string) revel.Result {
+    revel.ERROR.Println(captchaid)
+    capResult := new(CaptchaResult)
+    if "" == captchaid {
         capResult.ID = captcha.NewCaptcha()
     } else {
-        capResult.ID = captchaID
-        if !captcha.ReloadCaptcha(captchaID) {
+        capResult.ID = captchaid
+        if !captcha.ReloadCaptcha(captchaid) {
             capResult.ID = captcha.NewCaptcha()
         }
     }

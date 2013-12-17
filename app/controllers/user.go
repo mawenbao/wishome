@@ -142,6 +142,10 @@ func (c User) checkCaptcha(captchaid, captchaval string) bool {
     }
     if !captcha.VerifyCaptchaString(captchaid, captchaval) {
         c.Flash.Error(c.Message("error.captcha"))
+        // reload captcha at server side
+        if !captcha.ReloadCaptcha(captchaid) {
+            revel.ERROR.Printf("failed to reload captcha at server side")
+        }
         return false
     }
     return true
