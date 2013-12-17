@@ -28,7 +28,7 @@ func GetSigninError(name string) *SigninErrorSession {
     sess := new(SigninErrorSession)
     err := cache.Get(GetSigninErrorKeyName(name), sess)
     if nil != err {
-        revel.INFO.Printf("error get temp session from cache: %s", err)
+        revel.INFO.Printf("error get signin error from cache for %s: %s", name, err)
         return nil
     }
     return sess

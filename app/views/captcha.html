@@ -1,0 +1,9 @@
+<div class="row">
+    <input name="captchaid" id="captchaid" type="hidden" value="" />
+    <div class="col-md-7">
+        <input class="form-control" id="inputCaptcha" name="captchaval" placeholder="{{msg . "form.captcha"}}" required />
+    </div>
+    <div class="col-md-5">
+        <img name="captchaimg" id="captchaimage" onclick="loadCaptcha()" src="" />
+    </div>
+</div>

@@ -7,7 +7,7 @@ import (
     "github.com/mawenbao/wishome/app/models"
     "github.com/mawenbao/wishome/app/modules/database"
     "github.com/mawenbao/wishome/app/modules/common"
-    "github.com/mawenbao/wishome/app/modules/ext/caching"
+    "github.com/mawenbao/wishome/app/modules/caching"
 )
 
 var (

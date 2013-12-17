@@ -22,6 +22,7 @@ form.signup.name = %(form.signin.name)s
 form.signup.password = %(form.signin.password)s
 form.signup.email = %(form.signin.email)s
 form.resetpass.submit = Commit
+form.captcha = Captcha
 
 # flash messages
 user.greeting.new = welcome, %s

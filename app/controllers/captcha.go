@@ -4,21 +4,41 @@ import (
     "bytes"
     "github.com/robfig/revel"
     "github.com/mawenbao/wishome/app/results"
-    "github.com/mawenbao/wishome/app/modules/ext/captcha"
+    "github.com/mawenbao/wishome/app/modules/captcha"
 )
 
-type CaptchaC struct {
+type CaptchaResult struct {
+    ID string `json:"id"`
+    ImageURL string `json:"imageurl"`
+}
+
+type Captcha struct {
     *revel.Controller
 }
 
-// reload captcha by id and return its url
-func (c CaptchaC) GetImageCaptcha(captchaID string) revel.Result {
+func (c Captcha) GetCaptchaImage(id string) revel.Result {
     captchaImageBuff := new(bytes.Buffer)
-    if "" == captcha.GetImageCaptcha(captchaID, captchaImageBuff) {
-        revel.ERROR.Printf("failed to get catpcha, id %s, return 404", captchaID)
+    if !captcha.GenerateCaptchaImage(id, captchaImageBuff) {
+        revel.ERROR.Printf("failed to get catpcha, id %s, return 404", id)
         return c.NotFound("captcha not found") // 404
     }
 
     return results.ImagePngResult(captchaImageBuff.Bytes())
+}
+
+// reload captcha by id and return its url
+func (c Captcha) GetCaptcha(captchaID string) revel.Result {
+    capResult := new (CaptchaResult)
+    if "" == captchaID {
+        capResult.ID = captcha.NewCaptcha()
+    } else {
+        capResult.ID = captchaID
+        if !captcha.ReloadCaptcha(captchaID) {
+            capResult.ID = captcha.NewCaptcha()
+        }
+    }
+
+    capResult.ImageURL = "/captcha/getcaptchaimage?id=" + capResult.ID
+    return c.RenderJson(capResult)
 }
 

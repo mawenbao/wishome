@@ -66,6 +66,7 @@ func parseDbConfig() {
 // parse custom settings in app.conf and save in MyGlobal
 // parse failure will result in panic
 func parseCustomConfig() {
+    var err error
     // parse app url, app.url must be set in app.conf file
     appURL, found := revel.Config.String(CONFIG_APP_URL)
     if !found {
@@ -151,6 +152,35 @@ func parseCustomConfig() {
         MyGlobal[CONFIG_MAIL_SENDER] = "noreply@atime.me"
     } else {
         MyGlobal[CONFIG_MAIL_SENDER] = mailSender
+    }
+
+    // parse captcha
+    captchaLen, found := revel.Config.String(CONFIG_CAPTCHA_LENGTH)
+    if !found {
+        MyGlobal[CONFIG_CAPTCHA_LENGTH] = 6
+    } else {
+        MyGlobal[CONFIG_CAPTCHA_LENGTH], err = strconv.Atoi(captchaLen)
+        if nil != err {
+            revel.ERROR.Panicf("failed to convert captcha length %s to int", captchaLen)
+        }
+    }
+    captchaWidth, found := revel.Config.String(CONFIG_CAPTCHA_WIDTH)
+    if !found {
+        MyGlobal[CONFIG_CAPTCHA_WIDTH] = 100
+    } else {
+        MyGlobal[CONFIG_CAPTCHA_WIDTH], err = strconv.Atoi(captchaWidth)
+        if nil != err {
+            revel.ERROR.Panicf("failed to convert captcha width %s to int", captchaWidth)
+        }
+    }
+    captchaHeight, found := revel.Config.String(CONFIG_CAPTCHA_HEIGHT)
+    if !found {
+        MyGlobal[CONFIG_CAPTCHA_HEIGHT] = 40
+    } else {
+        MyGlobal[CONFIG_CAPTCHA_HEIGHT], err = strconv.Atoi(captchaHeight)
+        if nil != err {
+            revel.ERROR.Panicf("failed to convert captcha height %s to int", captchaHeight)
+        }
     }
 }
 

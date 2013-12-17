@@ -11,6 +11,7 @@ const (
     STR_EMAIL = "email"
     STR_KEY = "key"
     STR_EXPIRE = "expire"
+    STR_LASTUSER = "lastuser"
 
     CACHE_RESETPASS = "reset_pass"
     CACHE_SIGNUP_CONFIRM = "signup_confirm"
@@ -30,6 +31,9 @@ const (
     CONFIG_SESSION_LIFE = "session.life"
     CONFIG_DB_DRIVER = "db.driver"
     CONFIG_DB_SPEC = "db.spec"
+    CONFIG_CAPTCHA_WIDTH = "captcha.width"
+    CONFIG_CAPTCHA_HEIGHT = "captcha.height"
+    CONFIG_CAPTCHA_LENGTH = "captcha.length"
 )
 
 // default settings

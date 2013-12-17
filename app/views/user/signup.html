@@ -1,4 +1,5 @@
 {{append . "moreStyles" "css/form.css"}}
+{{append . "moreScripts" "js/captcha.js"}}
 {{template "header.html" .}}
 <div class="container">
     <div class="row">
@@ -28,6 +29,12 @@
                     <label for="inputPasswd" class="col-md-5 control-label">{{msg . "form.signup.password"}}</label>
                     <div class="col-md-7">
                         <input type="password" class="form-control" id="inputPasswd" name="password" placeholder="{{msg . "form.signup.password"}}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputCaptcha" class="col-md-5 control-label">{{msg . "form.captcha"}}</label>
+                    <div class="col-md-7">
+                        {{template "captcha.html" .}}
                     </div>
                 </div>
                 <div class="form-group">
