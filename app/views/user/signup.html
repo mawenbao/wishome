@@ -16,7 +16,7 @@
                     </div>
                     <label for="inputName" class="col-md-5 control-label">{{msg . "form.signup.name"}}</label>
                     <div class="col-md-7">
-                        <input class="form-control" id="inputName" name="name" placeholder="{{msg . "form.signup.name"}}" {{with .name}} autofocus value="{{.}}" {{end}} />
+                        <input class="form-control" id="inputName" name="name" placeholder="{{msg . "form.signup.name"}}" {{with .name}} value="{{.}}" {{else}} autofocus {{end}} />
                     </div>
                 </div>
                 <div class="form-group">
