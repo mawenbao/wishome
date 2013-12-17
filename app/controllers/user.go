@@ -1,7 +1,6 @@
 package controllers
 
 import (
-    "time"
     "fmt"
     "github.com/robfig/revel"
     "github.com/mawenbao/wishome/app"
@@ -20,42 +19,12 @@ type User struct {
     *revel.Controller
 }
 
-// return true if user session has expired
-func (c User) isSessionExpired() bool {
-    // check if session expires
-    if expiresHex, ok := c.Session[app.STR_EXPIRE]; !ok {
-        return true
-    } else {
-        if expires, ok := common.DecodeHexString(expiresHex); !ok {
-            revel.ERROR.Printf("failed to decode hex expire time %s", expiresHex)
-            return true
-        } else {
-            if expireTime, err:= time.Parse(app.DEFAULT_TIME_FORMAT, string(expires)); nil != err {
-                revel.ERROR.Printf("failed to parse expire time %s with format %s", expires, app.DEFAULT_TIME_FORMAT)
-                return true
-            } else {
-                if !expireTime.After(time.Now()) {
-                    revel.TRACE.Printf("session expired")
-                    return true
-                }
-            }
-        }
-    }
-
-    return false
-}
-
 func (c User) getLastUser() string {
-    if lastuser, ok := c.Session[app.STR_LASTUSER]; !ok {
+    sess := new(session.LongStaySession)
+    if !sess.Load(c.Session) {
         return ""
-    } else {
-        lastuserSL, _ := common.DecodeHexString(lastuser)
-        if nil == lastuserSL {
-            revel.ERROR.Printf("failed to decode LastUser from user session %s", lastuser)
-            return ""
-        }
-        return string(lastuserSL)
     }
+    return sess.LastUser
 }
 
 func (c User) setLastUser(lastuser string) {
@@ -71,37 +40,21 @@ func (c User) setUserSession(u *models.User) bool {
     if nil == sess {
         return false
     }
-    sess.Encrypt()
-
-    c.Session[app.STR_NAME] = sess.UserName
-    c.Session[app.STR_PASSWORD] = sess.Password
-    c.Session[app.STR_KEY] = sess.AesKey
-    c.Session[app.STR_LASTUSER] = sess.LastUser
-    c.Session[app.STR_EXPIRE] = sess.Expire
-    return true
+    return sess.Save(c.Session)
 }
 
-func (c User) loadUser() (u *models.User) {
+func (c User) loadUserSession() (u *models.User) {
     if "" == c.Session[app.STR_KEY] || "" == c.Session[app.STR_NAME] {
         return nil
     }
 
-    // check if session expires
-    if c.isSessionExpired() {
+    sess := new(session.UserSession)
+    if !sess.Load(c.Session) {
+        revel.ERROR.Println("failed loading user session from cookie")
         return nil
     }
-
-    sess := &session.UserSession {
-        AesKey: c.Session[app.STR_KEY],
-        UserName: c.Session[app.STR_NAME],
-        Password: c.Session[app.STR_PASSWORD],
-        LastUser: c.Session[app.STR_LASTUSER],
-        Expire: c.Session[app.STR_EXPIRE],
-        Encrypted: true,
-    }
-
-    if !sess.Decrypt() {
-        revel.ERROR.Printf("failed to decrypt user session for user %s", sess.UserName)
+    if sess.IsExpired() {
+        revel.INFO.Println("user session expired")
         return nil
     }
 
@@ -135,6 +88,8 @@ func (c User) emptyUserSession(name string) {
     caching.Remove(name)
 }
 
+// no matter verfication passed or failed, the captcha will
+// be removed from the server captcha datastore
 func (c User) checkCaptcha(captchaid, captchaval string) bool {
     if "" == captchaid || "" == captchaval {
         c.Flash.Error(c.Message("error.require.captcha"))
@@ -142,17 +97,13 @@ func (c User) checkCaptcha(captchaid, captchaval string) bool {
     }
     if !captcha.VerifyCaptchaString(captchaid, captchaval) {
         c.Flash.Error(c.Message("error.captcha"))
-        // reload captcha at server side
-        if !captcha.ReloadCaptcha(captchaid) {
-            revel.ERROR.Printf("failed to reload captcha at server side")
-        }
         return false
     }
     return true
 }
 
 func (c User) DoSignin(name, password, captchaid, captchaval string) revel.Result {
-    if uc := c.loadUser(); nil != uc {
+    if uc := c.loadUserSession(); nil != uc {
         c.emptyUserSession(name)
     }
 
@@ -191,12 +142,14 @@ func (c User) DoSignin(name, password, captchaid, captchaval string) revel.Resul
 
 func (c User) DoSignup(name, email, password, captchaid, captchaval string) revel.Result {
     // check if user has signed in already, if so, sign him out
-    if nil != c.loadUser() {
+    if nil != c.loadUserSession() {
         c.emptyUserSession(name)
     }
 
     // check captcha
     if !c.checkCaptcha(captchaid, captchaval) {
+        c.Flash.Out[app.STR_NAME] = name
+        c.Flash.Out[app.STR_EMAIL] = email
         return c.Redirect(routes.User.Signup())
     }
 
@@ -212,6 +165,8 @@ func (c User) DoSignup(name, email, password, captchaid, captchaval string) reve
     if c.Validation.HasErrors() {
         c.Validation.Keep()
         c.FlashParams()
+        c.Flash.Out[app.STR_NAME] = name
+        c.Flash.Out[app.STR_EMAIL] = email
         return c.Redirect(routes.User.Signup())
     }
 
@@ -223,6 +178,8 @@ func (c User) DoSignup(name, email, password, captchaid, captchaval string) reve
 
     // save user in database
     if !database.SaveUser(user) {
+        c.Flash.Out[app.STR_NAME] = name
+        c.Flash.Out[app.STR_EMAIL] = email
         c.Flash.Error(c.Message("user.save.error.db"))
         return c.Redirect(routes.User.Signup())
     } else {
@@ -233,7 +190,7 @@ func (c User) DoSignup(name, email, password, captchaid, captchaval string) reve
 }
 
 func (c User) DoSignout() revel.Result {
-    if uc := c.loadUser(); nil != uc && uc.IsSecured() {
+    if uc := c.loadUserSession(); nil != uc && uc.IsSecured() {
         revel.INFO.Printf("user %s signed out", uc.Name)
         c.emptyUserSession(uc.Name)
     }
@@ -243,7 +200,7 @@ func (c User) DoSignout() revel.Result {
 
 func (c User) Signin() revel.Result {
     // check if user has signed in
-    if uc := c.loadUser(); nil != uc && uc.IsSecured() {
+    if uc := c.loadUserSession(); nil != uc && uc.IsSecured() {
         return c.Redirect(routes.User.Home())
     }
 
@@ -260,26 +217,33 @@ func (c User) Signin() revel.Result {
 }
 
 func (c User) Signup() revel.Result {
-    if uc := c.loadUser(); nil != uc && uc.IsSecured() {
+    if uc := c.loadUserSession(); nil != uc && uc.IsSecured() {
         c.Flash.Success(c.Message("user.signout.succeeded"))
         c.emptyUserSession(uc.Name)
     }
 
     moreNavbarLinks := []models.NavbarLink{
     }
-    return c.Render(moreNavbarLinks)
+    name := c.Flash.Data[app.STR_NAME]
+    email := c.Flash.Data[app.STR_EMAIL]
+    return c.Render(moreNavbarLinks, name, email)
 }
 
 func (c User) ResetPass() revel.Result {
     name := c.getLastUser()
-    return c.Render(name)
+    email := c.Flash.Data[app.STR_EMAIL]
+    return c.Render(name, email)
 }
 
 // validate name, email and send an email to user with a random key
 // which is valid in half an hour
 func (c User) PreResetPass(name, email, captchaid, captchaval string) revel.Result {
+    // set last user
+    c.setLastUser(name)
+
     // check captcha
     if !c.checkCaptcha(captchaid, captchaval) {
+        c.Flash.Out[app.STR_EMAIL] = email
         return c.Redirect(routes.User.ResetPass())
     }
 
@@ -288,6 +252,7 @@ func (c User) PreResetPass(name, email, captchaid, captchaval string) revel.Resu
     if c.Validation.HasErrors() {
         c.Validation.Keep()
         c.FlashParams()
+        c.Flash.Out[app.STR_EMAIL] = email
         return c.Redirect(routes.User.ResetPass())
     }
 
@@ -379,7 +344,7 @@ func (c User) sendConfirmEmail(name, email string) bool {
 
 // user need to sign in first in order to resend confirmation email
 func (c User) ResendConfirmEmail() revel.Result {
-    cu := c.loadUser()
+    cu := c.loadUserSession()
     if nil == cu || !cu.IsValid() {
         c.Flash.Error(c.Message("error.require.signin"))
         return c.Redirect(routes.User.Signin())
@@ -407,7 +372,7 @@ func (c User) DoVerifyEmail(name, key string) revel.Result {
 
     // check if user signed in
     nextPage := routes.User.Signin()
-    if u := c.loadUser(); nil != u && u.IsSecured() {
+    if u := c.loadUserSession(); nil != u && u.IsSecured() {
         nextPage = routes.User.Home()
     }
 
@@ -455,7 +420,7 @@ func (c User) DoVerifyEmail(name, key string) revel.Result {
 
 func (c User) Home() revel.Result {
     // check if user has signed in
-    if cu := c.loadUser(); nil == cu || !cu.IsValid() {
+    if cu := c.loadUserSession(); nil == cu || !cu.IsValid() {
         c.Flash.Error(c.Message("error.require.signin"))
         return c.Redirect(routes.User.Signin())
     }

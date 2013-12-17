@@ -12,7 +12,6 @@ type UserSession struct {
     AesKey, // aes-256
     UserName,
     Password,
-    LastUser,
     Expire string
     Encrypted bool
 }
@@ -25,15 +24,18 @@ func NewUserSession(u *models.User) *UserSession {
         AesKey: common.NewRawRandom(32), // aes-256
         UserName: u.Name,
         Password: u.Password,
-        LastUser: u.Name,
         Expire: time.Now().Format(app.DEFAULT_TIME_FORMAT),
         Encrypted: false,
     }
 }
 
+func (s *UserSession) IsEncrypted() bool {
+    return s.Encrypted
+}
+
 func (s *UserSession) IsExpired() bool {
     expire := []byte(s.Expire)
-    if s.Encrypted {
+    if s.IsEncrypted() {
         expire, _ = common.DecodeHexString(s.Expire)
         if nil == expire {
             return true
@@ -74,7 +76,6 @@ func (s *UserSession) Encrypt() bool {
     s.AesKey = common.EncodeToHexString([]byte(s.AesKey))
     s.UserName = common.EncodeToHexString(cipherName)
     s.Password = common.EncodeToHexString(cipherPass)
-    s.LastUser = common.EncodeToHexString([]byte(s.LastUser))
     s.Expire = common.EncodeToHexString([]byte(s.Expire))
     s.Encrypted = true
     return true
@@ -112,19 +113,37 @@ func (s *UserSession) Decrypt() bool {
         revel.ERROR.Printf("failed to decode hex expire string %s", s.Expire)
         return false
     }
-    // hex decode lastuser
-    lastuser, _ := common.DecodeHexString(s.LastUser)
-    if nil == lastuser {
-        revel.ERROR.Printf("failed to decode hex lastuser string %s", s.LastUser)
-        return false
-    }
 
     s.AesKey = string(key)
     s.UserName = string(nameSl)
     s.Password = string(passSl)
-    s.LastUser = string(lastuser)
     s.Expire = string(expire)
     s.Encrypted = false
     return true
+}
+
+// encrypt user session and save in cookie
+func (s *UserSession) Save(session map[string]string) bool {
+    if !s.IsEncrypted() && !s.Encrypt() {
+        revel.ERROR.Println("failed to encrypt user session when saving in cookie")
+        return false
+    }
+
+    session[app.STR_NAME] = s.UserName
+    session[app.STR_PASSWORD] = s.Password
+    session[app.STR_KEY] = s.AesKey
+    session[app.STR_EXPIRE] = s.Expire
+    return true
+}
+
+// load user session from cookie and decrypt
+func (s *UserSession) Load(session map[string]string) bool {
+    s.AesKey = session[app.STR_KEY]
+    s.UserName = session[app.STR_NAME]
+    s.Password = session[app.STR_PASSWORD]
+    s.Expire = session[app.STR_EXPIRE]
+    s.Encrypted = true
+
+    return s.Decrypt()
 }
 

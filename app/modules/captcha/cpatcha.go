@@ -54,7 +54,11 @@ func GetCaptchaWithImage(id string, out io.Writer) string {
     return id
 }
 
+// captcha is removed immediately after verification, no matter passed or failed
 func VerifyCaptchaString(id, value string) bool {
+    if "" == id || "" == value {
+        return false
+    }
     return captcha.VerifyString(id, value)
 }
 
