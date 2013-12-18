@@ -213,7 +213,8 @@ func (c User) Signin() revel.Result {
         needCaptcha = true
     }
 
-    return c.Render(name, needCaptcha)
+    title := c.Message("title.signin")
+    return c.Render(name, needCaptcha, title)
 }
 
 func (c User) Signup() revel.Result {
@@ -226,13 +227,15 @@ func (c User) Signup() revel.Result {
     }
     name := c.Flash.Data[app.STR_NAME]
     email := c.Flash.Data[app.STR_EMAIL]
-    return c.Render(moreNavbarLinks, name, email)
+    title := c.Message("title.signup")
+    return c.Render(moreNavbarLinks, name, email, title)
 }
 
 func (c User) ResetPass() revel.Result {
     name := c.getLastUser()
     email := c.Flash.Data[app.STR_EMAIL]
-    return c.Render(name, email)
+    title := c.Message("title.resetpass")
+    return c.Render(name, email, title)
 }
 
 // validate name, email and send an email to user with a random key
@@ -265,7 +268,8 @@ func (c User) PreResetPass(name, email, captchaid, captchaval string) revel.Resu
 
 func (c User) PostResetPass(name, key string) revel.Result {
     revel.TRACE.Printf("postresetpass got reset password key %s for name %s", key, name)
-    return c.Render(name, key)
+    title := c.Message("title.resetpass")
+    return c.Render(name, key, title)
 }
 
 func (c User) DoResetPass(name, password, key, captchaid, captchaval string) revel.Result {

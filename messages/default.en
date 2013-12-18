@@ -3,9 +3,10 @@ common.user.none = User not found %s
 common.database.error = Database error
 
 # title
-title.login = Welcome to wishome
-title.register = Register on wishome
+title.signin = Welcome to wishome
+title.signup = Sign up to wishome
 title.resetpass = Reset your password
+title.home = User home
 
 # navbar
 navbar.brand = Wishome
