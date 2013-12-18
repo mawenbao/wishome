@@ -70,3 +70,6 @@ error.database = database error
 error.require.signin = please sign in first
 error.require.captcha = please entrer the captcha
 error.captcha = wrong captcha
+
+# home top
+home.top.info.email_verify = Please verify your email address.<br/>Click <a href="/user/resendconfirmemail">here</a> to get a new confirmation email.

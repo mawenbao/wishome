@@ -2,11 +2,30 @@
 {{template "navbar.html" .}}
 <div class="container main-container">
     <div class="row">
-        <div class="col-md-8 col-md-offset-4 main-heading">
-            <h1>Welcome to wishome, {{.user.Name}}</h1>
-        </div>
-        <div class="text-center">
+        <div class="col-md-6 col-md-offset-3 text-center">
             {{template "flash.html" .}}
+        </div>
+        <div class="col-md-6 col-md-offset-3 text-center">
+            {{with .topSuccess}}
+            <div class="alert alert-success">
+                {{.}}
+            </div>
+            {{end}}
+            {{with .topInfo}}
+            <div class="alert alert-info">
+                {{.|unescape}}
+            </div>
+            {{end}}
+            {{with .topWarn}}
+            <div class="alert alert-warning">
+                {{.|unescape}}
+            </div>
+            {{end}}
+            {{with .topDanger}}
+            <div class="alert alert-danger">
+                {{.}}
+            </div>
+            {{end}}
         </div>
 </div>
 {{template "footer.html" .}}

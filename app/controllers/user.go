@@ -424,14 +424,21 @@ func (c User) DoVerifyEmail(name, key string) revel.Result {
 
 func (c User) Home() revel.Result {
     // check if user has signed in
-    if cu := c.loadUserSession(); nil == cu || !cu.IsValid() {
+    cu := c.loadUserSession()
+    if nil == cu || !cu.IsValid() {
         c.Flash.Error(c.Message("error.require.signin"))
         return c.Redirect(routes.User.Signin())
+    }
+
+    var topWarn string
+    // check if user has verified email address
+    if !database.IsEmailVerified(cu.Name) {
+        topWarn = c.Message("home.top.info.email_verify")
     }
 
     moreNavbarLinks := []models.NavbarLink{
         models.NavbarLink{"/user/dosignout", "sign out", "sign out", false},
     }
-    return c.Render(moreNavbarLinks)
+    return c.Render(moreNavbarLinks, topWarn)
 }
 
