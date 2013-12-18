@@ -12,6 +12,7 @@ import (
     "github.com/mawenbao/wishome/app/modules/mail"
     "github.com/mawenbao/wishome/app/modules/captcha"
     "github.com/mawenbao/wishome/app/modules/session"
+    "github.com/mawenbao/wishome/app/modules/template"
     "github.com/mawenbao/wishome/app/routes"
 )
 
@@ -324,11 +325,13 @@ func (c User) sendResetPassEmail(name, email string) bool {
     )
 
     revel.INFO.Printf("try to send a reset password mail to %s", email)
-    return mail.SendHtmlMailBase64(
-        email,
-        c.Message("user.resetpass.mail.subject"),
-        []byte(c.Message("user.resetpass.mail.content", resetPassUrl, app.MyGlobal.Duration(app.CONFIG_RESETPASS_KEY_LIFE).Minutes())),
-    )
+    mailBody := template.LoadResetPassEmail(name, resetPassUrl)
+    if nil == mailBody {
+        revel.ERROR.Printf("failed to load resetpass email body for %s", name)
+        return false
+    } else {
+        return mail.SendHtmlMailBase64(email, c.Message("user.resetpass.mail.subject"), mailBody)
+    }
 }
 
 func (c User) sendConfirmEmail(name, email string) bool {
@@ -339,11 +342,14 @@ func (c User) sendConfirmEmail(name, email string) bool {
         caching.NewSignupConfirmKey(name),
     )
     revel.INFO.Printf("try to send a signup confirmation email to %s", email)
-    return mail.SendHtmlMailBase64(
-        email,
-        c.Message("user.signup.mail.subject"),
-        []byte(c.Message("user.signup.mail.content", cfmURL, app.MyGlobal.Duration(app.CONFIG_SIGNUP_KEY_LIFE).Minutes())),
-    )
+
+    mailBody := template.LoadConfirmEmail(name, cfmURL)
+    if nil == mailBody {
+        revel.ERROR.Printf("failed to load confirmation email body for %s", name)
+        return false
+    } else {
+        return mail.SendHtmlMailBase64(email, c.Message("user.signup.mail.subject"), mailBody)
+    }
 }
 
 // user need to sign in first in order to resend confirmation email

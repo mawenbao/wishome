@@ -4,6 +4,8 @@ import (
     "log"
     "time"
     "net"
+    "path/filepath"
+    "io/ioutil"
     "strconv"
     "github.com/robfig/revel"
 )
@@ -177,5 +179,28 @@ func parseCustomConfig() {
     if !found {
         MyGlobal[CONFIG_SIGNIN_USECAPTCHA] = 5
     }
+
+    // parse custom template paths and save the file content
+    MyGlobal[CONFIG_TEMPLATE_CONFIRM_EMAIL], found = revel.Config.String(CONFIG_TEMPLATE_CONFIRM_EMAIL)
+    if !found {
+        MyGlobal[CONFIG_TEMPLATE_CONFIRM_EMAIL] = "data/ConfirmationEmail.html"
+    }
+    MyGlobal[CONFIG_TEMPLATE_CONFIRM_EMAIL] = filepath.Join(revel.BasePath, MyGlobal.String(CONFIG_TEMPLATE_CONFIRM_EMAIL))
+    confirmTemplData, err := ioutil.ReadFile(MyGlobal.String(CONFIG_TEMPLATE_CONFIRM_EMAIL))
+    if nil != err {
+        revel.ERROR.Panicf("failed to read confirmation template from %s: %s", MyGlobal.String(CONFIG_TEMPLATE_CONFIRM_EMAIL), err)
+    }
+    MyGlobal[CONFIG_TEMPLATE_CONFIRM_EMAIL] = string(confirmTemplData)
+
+    MyGlobal[CONFIG_TEMPLATE_RESETPASS_EMAIL], found = revel.Config.String(CONFIG_TEMPLATE_RESETPASS_EMAIL)
+    if !found {
+        MyGlobal[CONFIG_TEMPLATE_RESETPASS_EMAIL] = "data/ResetPassEmail.html"
+    }
+    MyGlobal[CONFIG_TEMPLATE_RESETPASS_EMAIL] = filepath.Join(revel.BasePath, MyGlobal.String(CONFIG_TEMPLATE_RESETPASS_EMAIL))
+    resetPassTemplData, err := ioutil.ReadFile(MyGlobal.String(CONFIG_TEMPLATE_RESETPASS_EMAIL))
+    if nil != err {
+        revel.ERROR.Panicf("failed to read resetpass template from %s: %s", MyGlobal.String(CONFIG_TEMPLATE_RESETPASS_EMAIL), err)
+    }
+    MyGlobal[CONFIG_TEMPLATE_RESETPASS_EMAIL] = string(resetPassTemplData)
 }
 
