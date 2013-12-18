@@ -324,7 +324,7 @@ func (c User) sendResetPassEmail(name, email string) bool {
     )
 
     revel.INFO.Printf("try to send a reset password mail to %s", email)
-    return mail.SendMail(
+    return mail.SendHtmlMailBase64(
         email,
         c.Message("user.resetpass.mail.subject"),
         []byte(c.Message("user.resetpass.mail.content", resetPassUrl, app.MyGlobal.Duration(app.CONFIG_RESETPASS_KEY_LIFE).Minutes())),
@@ -339,7 +339,7 @@ func (c User) sendConfirmEmail(name, email string) bool {
         caching.NewSignupConfirmKey(name),
     )
     revel.INFO.Printf("try to send a signup confirmation email to %s", email)
-    return mail.SendMail(
+    return mail.SendHtmlMailBase64(
         email,
         c.Message("user.signup.mail.subject"),
         []byte(c.Message("user.signup.mail.content", cfmURL, app.MyGlobal.Duration(app.CONFIG_SIGNUP_KEY_LIFE).Minutes())),

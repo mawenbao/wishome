@@ -6,9 +6,65 @@ import (
     "crypto/tls"
     "github.com/robfig/revel"
     "github.com/mawenbao/wishome/app"
+    "github.com/mawenbao/wishome/app/modules/common"
 )
 
-func SendMail(to, subject string, content []byte) bool {
+const (
+    NEWLINE = "\r\n"
+    MIME = "MIME-Version: 1.0" + NEWLINE + "Content-Type: %s; charset=\"UTF-8\""
+    BASE64_ENCODING = "Content-Transfer-Encoding: base64"
+    SUBJECT = "Subject: %s"
+    TO = "To: %s"
+    MAIL_HEADER = MIME + NEWLINE + SUBJECT + NEWLINE + TO
+    MAIL_FORMAT = MAIL_HEADER + NEWLINE + NEWLINE + "%s" // content-type + subject + to + body
+    MAIL_FORMAT_BASE64 = BASE64_ENCODING + NEWLINE + MAIL_FORMAT
+)
+
+func SendTextMail(to, subject string, content []byte) bool {
+    mail := fmt.Sprintf(
+        MAIL_FORMAT,
+        "text/plain",
+        subject,
+        to,
+        content,
+    )
+    return SendRawMail(to, []byte(mail))
+}
+
+func SendTextMailBase64(to, subject string, content []byte) bool {
+    mail := fmt.Sprintf(
+        MAIL_FORMAT_BASE64,
+        "text/plain",
+        subject,
+        to,
+        common.EncodeBase64(content),
+    )
+    return SendRawMail(to, []byte(mail))
+}
+
+func SendHtmlMail(to, subject string, content []byte) bool {
+    mail := fmt.Sprintf(
+        MAIL_FORMAT,
+        "text/html",
+        subject,
+        to,
+        content,
+    )
+    return SendRawMail(to, []byte(mail))
+}
+
+func SendHtmlMailBase64(to, subject string, content []byte) bool {
+    mail := fmt.Sprintf(
+        MAIL_FORMAT_BASE64,
+        "text/html",
+        subject,
+        to,
+        common.EncodeBase64(content),
+    )
+    return SendRawMail(to, []byte(mail))
+}
+
+func SendRawMail(to string, mailData []byte) bool {
     mailClient, err := smtp.Dial(app.MyGlobal.String(app.CONFIG_MAIL_SMTP_ADDR))
     if nil != err {
         revel.ERROR.Printf("failed to connect to smtp server %s: %s", app.MyGlobal.String(app.CONFIG_MAIL_SMTP_ADDR), err)
@@ -39,14 +95,7 @@ func SendMail(to, subject string, content []byte) bool {
     }
     defer wc.Close()
 
-    mailBody := fmt.Sprintf(
-        "To: %s\r\nSubject: %s\r\n\r\n%s",
-        to,
-        subject,
-        content,
-    )
-
-    _, err = wc.Write([]byte(mailBody))
+    _, err = wc.Write(mailData)
     if nil != err {
         revel.ERROR.Printf("failed to write mail content: %s", err)
         return false
