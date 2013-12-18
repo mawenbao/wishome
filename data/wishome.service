@@ -1,0 +1,45 @@
+#!/bin/bash
+
+### BEGIN INIT INFO
+# Provides:          mawenbao
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: start and stop the wishome service
+### END INIT INFO
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON_HOME=/home/wilbur/www/wishome
+DESC="wishome server"
+NAME=wishome
+
+set -e
+
+case "$1" in
+	start)
+		echo "Starting $DESC: "
+        cd $DAEMON_HOME
+        nohup sh run.sh &
+		;;
+
+    stop)
+        echo "Stop $DESC"
+        PIDS=$(ps aux | grep "$NAME" | grep -v grep | awk '{print $2}')
+        kill -9 $PIDS
+        ;;
+
+    restart)
+        echo "Stop $DESC"
+        kill -9 `ps aux | grep "$NAME" | grep -v grep | awk '{print $2}'`
+
+        echo -n "Start $DESC"
+        cd $DAEMON_HOME
+        nohup sh run.sh &
+        ;;
+
+	*)
+		echo "Usage: service $NAME {start|stop|restart}" >&2
+		exit 1
+		;;
+esac
+
+exit 0
