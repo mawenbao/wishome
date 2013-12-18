@@ -11,6 +11,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON_HOME=/home/wilbur/www/wishome
 DESC="wishome server"
 NAME=wishome
+FIND_PROC='ps aux | grep "$NAME" | grep -v grep'
 
 set -e
 
@@ -36,8 +37,12 @@ case "$1" in
         nohup sh run.sh &
         ;;
 
+    status)
+        ps aux | grep "$NAME" | grep -v grep | grep -v init.d
+        ;;
+
 	*)
-		echo "Usage: service $NAME {start|stop|restart}" >&2
+		echo "Usage: service $NAME {start|stop|restart|status}" >&2
 		exit 1
 		;;
 esac
