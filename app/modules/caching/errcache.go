@@ -1,16 +1,9 @@
 package caching
 
 import (
-    "time"
     "github.com/robfig/revel"
     "github.com/robfig/revel/cache"
     "github.com/mawenbao/wishome/app"
-)
-
-var (
-    SIGNIN_SESSION_LIFE = time.Duration(1 * time.Hour)
-    SIGNIN_CAPCHAR_LIMIT = 5
-    SIGNIN_ERROR_LIMIT = 50
 )
 
 type SigninErrorCache struct {

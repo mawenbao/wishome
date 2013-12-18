@@ -180,6 +180,17 @@ func parseCustomConfig() {
         MyGlobal[CONFIG_SIGNIN_USECAPTCHA] = 5
     }
 
+    // lock user signin after too many errors in this time
+    signinBanTime, found := revel.Config.String(CONFIG_SIGNIN_BAN_TIME)
+    if !found {
+        MyGlobal[CONFIG_SIGNIN_BAN_TIME] = time.Duration(1 * time.Hour)
+    } else {
+        MyGlobal[CONFIG_SIGNIN_BAN_TIME], err = time.ParseDuration(signinBanTime)
+        if nil != err {
+            revel.ERROR.Panicf("failed to parse user signin ban time %s, value is %s", CONFIG_SIGNIN_BAN_TIME, signinBanTime)
+        }
+    }
+
     // parse custom template paths and save the file content
     MyGlobal[CONFIG_TEMPLATE_CONFIRM_EMAIL], found = revel.Config.String(CONFIG_TEMPLATE_CONFIRM_EMAIL)
     if !found {

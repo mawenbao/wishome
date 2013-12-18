@@ -113,7 +113,10 @@ func (c User) DoSignin(name, password, captchaid, captchaval string) revel.Resul
 
     // check user signin error type and times
     if caching.IsSigninBanned(name) {
-        c.Flash.Error(c.Message("user.signin.error.banned", caching.SIGNIN_SESSION_LIFE))
+        c.Flash.Error(c.Message(
+            "user.signin.error.banned",
+            fmt.Sprintf("%.0f minutes", app.MyGlobal.Duration(app.CONFIG_SIGNIN_BAN_TIME).Minutes()),
+        ))
         return c.Redirect(routes.User.Signin())
     }
 

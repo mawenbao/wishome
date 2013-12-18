@@ -39,6 +39,7 @@ const (
     CONFIG_SIGNIN_CACHE_LIFE = "session.signin.life"
     CONFIG_SIGNIN_USECAPTCHA = "user.signin.usecaptcha"
     CONFIG_SIGNIN_ERROR_LIMIT = "session.error.limit"
+    CONFIG_SIGNIN_BAN_TIME = "user.signin.ban_time"
     // custom template path, save file content in custom global config
     CONFIG_TEMPLATE_CONFIRM_EMAIL = "template.path.confirm_email"
     CONFIG_TEMPLATE_RESETPASS_EMAIL = "template.path.resetpass_email"
