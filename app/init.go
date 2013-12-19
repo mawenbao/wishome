@@ -77,7 +77,7 @@ func parseCustomConfig() {
     }
 
     // parse cpu number
-    MyGloal[CONFIG_APP_CPU_NUM], found = revel.Config.Int(CONFIG_APP_CPU_NUM)
+    MyGlobal[CONFIG_APP_CPU_NUM], found = revel.Config.Int(CONFIG_APP_CPU_NUM)
     if !found {
         MyGlobal[CONFIG_APP_CPU_NUM] = runtime.NumCPU()
     } else {
