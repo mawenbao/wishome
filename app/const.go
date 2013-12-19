@@ -20,6 +20,7 @@ const (
     TABLE_USERS = "users"
 
     CONFIG_APP_URL = "app.url"
+    CONFIG_APP_CPU_NUM = "app.cpu_num"
     CONFIG_RESETPASS_KEY_LEN = "user.resetpass.keylen"
     CONFIG_RESETPASS_KEY_LIFE = "user.resetpass.keylife"
     CONFIG_SIGNUP_KEY_LEN = "user.signup.keylen"

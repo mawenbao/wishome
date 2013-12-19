@@ -4,6 +4,7 @@ import (
     "log"
     "time"
     "net"
+    "runtime"
     "path/filepath"
     "io/ioutil"
     "strconv"
@@ -74,6 +75,17 @@ func parseCustomConfig() {
     if !found {
         revel.ERROR.Panicf("%s not set in app.conf. This is required configuration which denotes the host/ip address of your wishome app.", CONFIG_APP_URL)
     }
+
+    // parse cpu number
+    MyGloal[CONFIG_APP_CPU_NUM], found = revel.Config.Int(CONFIG_APP_CPU_NUM)
+    if !found {
+        MyGlobal[CONFIG_APP_CPU_NUM] = runtime.NumCPU()
+    } else {
+        if 1 > MyGlobal.Int(CONFIG_APP_CPU_NUM) {
+            MyGlobal[CONFIG_APP_CPU_NUM] = runtime.NumCPU()
+        }
+    }
+    runtime.GOMAXPROCS(MyGlobal.Int(CONFIG_APP_CPU_NUM))
 
     // parse session lifetime
     sessLife, found := revel.Config.String(CONFIG_SESSION_LIFE)
