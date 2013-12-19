@@ -56,6 +56,11 @@ func GetCaptchaWithImage(id string, out io.Writer) string {
 
 // captcha is removed immediately after verification, no matter passed or failed
 func VerifyCaptchaString(id, value string) bool {
+    // disable captcha checking in debug mode
+    if revel.DevMode {
+        return true
+    }
+
     if "" == id || "" == value {
         return false
     }
