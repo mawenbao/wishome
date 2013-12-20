@@ -11,34 +11,44 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON_HOME=/home/wilbur/www/wishome
 DESC="wishome server"
 NAME=wishome
-FIND_PROC='ps aux | grep "$NAME" | grep -v grep'
 
 set -e
 
+start() {
+    echo "Starting $DESC: "
+    cd $DAEMON_HOME
+    nohup sh run.sh &
+}
+
+stop() {
+    echo "Stop $DESC"
+    PID=$(ps aux | grep "$NAME" | grep -v grep | grep -E "(importPath|srcPath|runMode)" | awk '{print $2}')
+    if [ "" != "$PID"]
+    then
+        kill -9 $PID
+    fi
+}
+
+status() {
+    ps aux | grep "$NAME" | grep -v grep | grep -E "(importPath|srcPath|runMode)" | awk '{print $2}'
+}
+
 case "$1" in
 	start)
-		echo "Starting $DESC: "
-        cd $DAEMON_HOME
-        nohup sh run.sh &
+        start
 		;;
 
     stop)
-        echo "Stop $DESC"
-        PIDS=$(ps aux | grep "$NAME" | grep -v grep | grep -E "(importPath|srcPath|runMode)" | awk '{print $2}')
-        kill -9 $PIDS
+        stop
         ;;
 
     restart)
-        echo "Stop $DESC"
-        kill -9 `ps aux | grep "$NAME" | grep -v grep | grep -E "(importPath|srcPath|runMode)" | awk '{print $2}'`
-
-        echo "Start $DESC"
-        cd $DAEMON_HOME
-        nohup sh run.sh &
+        stop
+        start
         ;;
 
     status)
-        ps aux | grep "$NAME" | grep -v grep | grep -v init.d
+        status
         ;;
 
 	*)
