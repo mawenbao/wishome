@@ -24,15 +24,15 @@ case "$1" in
 
     stop)
         echo "Stop $DESC"
-        PIDS=$(ps aux | grep "$NAME" | grep -v grep | awk '{print $2}')
+        PIDS=$(ps aux | grep "$NAME" | grep -v grep | grep -E "(importPath|srcPath|runMode)" | awk '{print $2}')
         kill -9 $PIDS
         ;;
 
     restart)
         echo "Stop $DESC"
-        kill -9 `ps aux | grep "$NAME" | grep -v grep | awk '{print $2}'`
+        kill -9 `ps aux | grep "$NAME" | grep -v grep | grep -E "(importPath|srcPath|runMode)" | awk '{print $2}'`
 
-        echo -n "Start $DESC"
+        echo "Start $DESC"
         cd $DAEMON_HOME
         nohup sh run.sh &
         ;;
