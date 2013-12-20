@@ -16,11 +16,16 @@ const (
     CACHE_RESETPASS = "reset_pass"
     CACHE_SIGNUP_CONFIRM = "signup_confirm"
     CACHE_SIGNIN_ERROR = "signin_err_sess"
+    CACHE_TIMER = "timer"
 
     TABLE_USERS = "users"
 
+    CONFIG_DB_DRIVER = "db.driver"
+    CONFIG_DB_SPEC = "db.spec"
+
     CONFIG_APP_URL = "app.url"
     CONFIG_APP_CPU_NUM = "app.cpu_num"
+    CONFIG_ADMIN_IP_LIST = "admin.ip_list"
     CONFIG_RESETPASS_KEY_LEN = "user.resetpass.keylen"
     CONFIG_RESETPASS_KEY_LIFE = "user.resetpass.keylife"
     CONFIG_SIGNUP_KEY_LEN = "user.signup.keylen"
@@ -29,8 +34,6 @@ const (
     CONFIG_MAIL_SMTP_HOST = "mail.smtp.host"
     CONFIG_MAIL_SMTP_PORT = "mail.smtp.port"
     CONFIG_MAIL_SENDER = "mail.sender"
-    CONFIG_DB_DRIVER = "db.driver"
-    CONFIG_DB_SPEC = "db.spec"
     CONFIG_CAPTCHA_WIDTH = "captcha.width"
     CONFIG_CAPTCHA_HEIGHT = "captcha.height"
     CONFIG_CAPTCHA_LENGTH = "captcha.length"

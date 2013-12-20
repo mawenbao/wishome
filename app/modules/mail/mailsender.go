@@ -65,9 +65,9 @@ func SendHtmlMailBase64(to, subject string, content []byte) bool {
 }
 
 func SendRawMail(to string, mailData []byte) bool {
-    mailClient, err := smtp.Dial(app.MyGlobal.String(app.CONFIG_MAIL_SMTP_ADDR))
+    mailClient, err := smtp.Dial(app.MyGlobal.MailServerAddr)
     if nil != err {
-        revel.ERROR.Printf("failed to connect to smtp server %s: %s", app.MyGlobal.String(app.CONFIG_MAIL_SMTP_ADDR), err)
+        revel.ERROR.Printf("failed to connect to smtp server %s: %s", app.MyGlobal.MailServerAddr, err)
         return false
     }
     defer mailClient.Close()
@@ -77,7 +77,7 @@ func SendRawMail(to string, mailData []byte) bool {
         // avoid error: x509: certificate signed by unknown authority
         tlc := &tls.Config{
             InsecureSkipVerify: true,
-            ServerName: app.MyGlobal.String(app.CONFIG_MAIL_SMTP_HOST),
+            ServerName: app.MyGlobal.MailServerHost,
         }
         if err = mailClient.StartTLS(tlc); nil != err {
             revel.ERROR.Printf("failed to start tls: %s", err)
@@ -85,7 +85,7 @@ func SendRawMail(to string, mailData []byte) bool {
         }
     }
 
-    mailClient.Mail(app.MyGlobal.String(app.CONFIG_MAIL_SENDER))
+    mailClient.Mail(app.MyGlobal.MailSender)
     mailClient.Rcpt(to)
 
     wc, err := mailClient.Data()

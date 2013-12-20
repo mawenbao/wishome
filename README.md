@@ -14,8 +14,9 @@ A simple web site built with revel.
 4. <del>captcha verification</del>, <del>should refresh cpatcha id at server side</del>
 5. <del>use message translation in modules/validators package too</del>
 6. <del>move session related logic from controller to modules/session</del>
-7. Use a custom struct type for custom global config.
+7. <del>Use a custom struct type for custom global config.</del>
 8. <del>Move input autofocus related logic from template to javascript.</del>
+9. <del>count action response time in admin page</del>
 
 ## Issues
 1. <del>Fix: resetpass.html template will autofocus on the email input even if name is not set.</del>

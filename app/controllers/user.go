@@ -115,7 +115,7 @@ func (c User) DoSignin(name, password, captchaid, captchaval string) revel.Resul
     if caching.IsSigninBanned(name) {
         c.Flash.Error(c.Message(
             "user.signin.error.banned",
-            fmt.Sprintf("%.0f minutes", app.MyGlobal.Duration(app.CONFIG_SIGNIN_BAN_TIME).Minutes()),
+            fmt.Sprintf("%.0f minutes", app.MyGlobal.SigninBanTime.Minutes()),
         ))
         return c.Redirect(routes.User.Signin())
     }
@@ -322,7 +322,7 @@ func (c User) DoResetPass(name, password, key, captchaid, captchaval string) rev
 func (c User) sendResetPassEmail(name, email string) bool {
     resetPassUrl := fmt.Sprintf(
         "%s/user/postresetpass?name=%s&key=%s",
-        app.MyGlobal[app.CONFIG_APP_URL],
+        app.MyGlobal.AppUrl,
         name,
         caching.NewResetPassKey(name),
     )
@@ -340,7 +340,7 @@ func (c User) sendResetPassEmail(name, email string) bool {
 func (c User) sendConfirmEmail(name, email string) bool {
     cfmURL := fmt.Sprintf(
         "%s/user/doverifyemail?name=%s&key=%s",
-        app.MyGlobal[app.CONFIG_APP_URL],
+        app.MyGlobal.AppUrl,
         name,
         caching.NewSignupConfirmKey(name),
     )

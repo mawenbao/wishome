@@ -30,7 +30,7 @@ func (dbmgr *DbManager) Init() bool {
     // add tables
     dbmgr.DbMap.AddTableWithName(models.User{}, app.TABLE_USERS).SetKeys(true, "id")
     // open db(pooled)
-    db, err := sql.Open(app.MyGlobal.String(app.CONFIG_DB_DRIVER), app.MyGlobal.String(app.CONFIG_DB_SPEC))
+    db, err := sql.Open(app.MyGlobal.DbDriver, app.MyGlobal.DbSpec)
     if nil != err {
         revel.ERROR.Printf("failed to get a new database connection: %s", err)
         return false

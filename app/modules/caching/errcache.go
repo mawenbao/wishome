@@ -56,15 +56,15 @@ func NewSigninError(name string) *SigninErrorCache {
     } else {
         // update cache
         sess.ErrorCount += 1
-        if sess.ErrorCount >= app.MyGlobal.Int(app.CONFIG_SIGNIN_USECAPTCHA) {
+        if sess.ErrorCount >= app.MyGlobal.SigninUseCaptchaErrorNum {
             sess.CaptchaRequired = true
         }
-        if sess.ErrorCount >= app.MyGlobal.Int(app.CONFIG_SIGNIN_ERROR_LIMIT) {
+        if sess.ErrorCount >= app.MyGlobal.SigninErrLimit {
             sess.Banned = true
         }
     }
 
-    go cache.Set(GetSigninErrorKeyName(name), *sess, app.MyGlobal.Duration(app.CONFIG_SIGNIN_CACHE_LIFE))
+    go cache.Set(GetSigninErrorKeyName(name), *sess, app.MyGlobal.SigninErrCacheLife)
     return sess
 }
 

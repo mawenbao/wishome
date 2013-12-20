@@ -11,6 +11,6 @@ function loadCaptcha() {
     }).done(function(resp) {
         $('#captchaid').val(resp.id);
         $('#captchaimage').attr('src', resp.imageurl);
-    })
+    });
 }
 

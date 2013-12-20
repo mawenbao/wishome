@@ -22,22 +22,22 @@ type ResetPassEmailArgs struct {
 func LoadConfirmEmail(user, link string) []byte {
     args := ConfirmEmailArgs {
         User: user,
-        Host: app.MyGlobal.String(app.CONFIG_APP_URL),
+        Host: app.MyGlobal.AppUrl,
         Link: link,
-        LinkLife: fmt.Sprintf("%.0f minutes", app.MyGlobal.Duration(app.CONFIG_SIGNUP_KEY_LIFE).Minutes()),
+        LinkLife: fmt.Sprintf("%.0f minutes", app.MyGlobal.SignupKeyLife.Minutes()),
     }
 
-    return LoadTempate("Confirmation Email Template", app.MyGlobal.String(app.CONFIG_TEMPLATE_CONFIRM_EMAIL), args)
+    return LoadTempate("Confirmation Email Template", app.MyGlobal.TemplateConfirmMail, args)
 }
 
 func LoadResetPassEmail(user, link string) []byte {
     args := ResetPassEmailArgs {
         User: user,
-        Host: app.MyGlobal.String(app.CONFIG_APP_URL),
+        Host: app.MyGlobal.AppUrl,
         Link: link,
-        LinkLife: fmt.Sprintf("%.0f minutes", app.MyGlobal.Duration(app.CONFIG_RESETPASS_KEY_LIFE).Minutes()),
+        LinkLife: fmt.Sprintf("%.0f minutes", app.MyGlobal.ResetPassKeyLife.Minutes()),
     }
 
-    return LoadTempate("Reset Password Email Template", app.MyGlobal.String(app.CONFIG_TEMPLATE_RESETPASS_EMAIL), args)
+    return LoadTempate("Reset Password Email Template", app.MyGlobal.TemplateResetPassMail, args)
 }
 

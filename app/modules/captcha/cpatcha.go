@@ -12,7 +12,7 @@ func GenerateCaptchaImage(id string, out io.Writer) bool {
         revel.ERROR.Println("cannot generate captcha image for empty id")
         return false
     }
-    err := captcha.WriteImage(out, id, app.MyGlobal.Int(app.CONFIG_CAPTCHA_WIDTH), app.MyGlobal.Int(app.CONFIG_CAPTCHA_HEIGHT))
+    err := captcha.WriteImage(out, id, app.MyGlobal.CaptchaImgWidth, app.MyGlobal.CaptchaImgHeight)
     if nil != err {
         revel.ERROR.Printf("failed to generate captcha image for id %s", id)
         return false
@@ -21,7 +21,7 @@ func GenerateCaptchaImage(id string, out io.Writer) bool {
 }
 
 func NewCaptcha() string {
-    return captcha.NewLen(app.MyGlobal.Int(app.CONFIG_CAPTCHA_LENGTH))
+    return captcha.NewLen(app.MyGlobal.CaptchaLength)
 }
 
 // realod captcha and save it
@@ -58,6 +58,7 @@ func GetCaptchaWithImage(id string, out io.Writer) string {
 func VerifyCaptchaString(id, value string) bool {
     // disable captcha checking in debug mode
     if revel.DevMode {
+        revel.WARN.Printf("catpcha verification will always return true in dev mode")
         return true
     }
 
