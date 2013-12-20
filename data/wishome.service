@@ -23,14 +23,14 @@ start() {
 stop() {
     echo "Stop $DESC"
     PID=$(ps aux | grep "$NAME" | grep -v grep | grep -E "(importPath|srcPath|runMode)" | awk '{print $2}')
-    if [ "" != "$PID"]
+    if [ "" != "$PID" ]
     then
         kill -9 $PID
     fi
 }
 
 status() {
-    ps aux | grep "$NAME" | grep -v grep | grep -E "(importPath|srcPath|runMode)" | awk '{print $2}'
+    ps aux | grep "$NAME" | grep -v grep | grep -E "(importPath|srcPath|runMode)"
 }
 
 case "$1" in
