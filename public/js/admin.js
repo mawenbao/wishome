@@ -1,23 +1,24 @@
 // load timer results
 
 $(document).ready(function() {
+    // load timer results
     loadTimerResults();
 })
 
 function loadTimerResults() {
-    setInterval(
-        function(){
-            $.ajax({
-                type: 'GET',
-                url: '/admin/gettimerresults'
-            }).done(setTimerResultsTable)
-        },
-        1000
-    )
+    setInterval(queryTimerResults, 1000);
+}
+
+function queryTimerResults() {
+    $.ajax({
+        type: 'POST',
+        data: "sort=1",
+        url: '/admin/gettimerresults'
+    }).done(setTimerResultsTable);
 }
 
 function setTimerResultsTable(resp) {
-    var tableBody = $('#timerResultsTBody');
+    var tableBody = $('#timerResultsTableBody');
     tableBody.empty();
 
     $.each(resp, function(i, item) {

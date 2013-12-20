@@ -6,6 +6,7 @@ module:testrunner
 module:jobs
 
 GET      /                                       User.Signin
+GET      /admin                                  Admin.Home
 
 # Ignore favicon requests
 #GET     /favicon.ico                            404
