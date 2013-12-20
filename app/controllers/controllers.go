@@ -14,7 +14,11 @@ func init() {
 func GetRemoteAddr(c *revel.Controller) string {
     // check first element of X-Forwarded-For header
     if forwds := c.Request.Header.Get("X-Forwarded-For"); "" == forwds {
-        // split host and port
+        // check X-Real-Ip
+        if realIp := c.Request.Header.Get("X-Real-Ip"); "" != realIp {
+            return strings.TrimSpace(realIp)
+        }
+        // use Request.RemoteAddr, split host and port
         host, _, err := net.SplitHostPort(c.Request.RemoteAddr)
         if nil != err {
             revel.ERROR.Printf("failed to split host:port string %s: %s", c.Request.RemoteAddr, err)

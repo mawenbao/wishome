@@ -84,7 +84,6 @@ func (gconf *MyGlobalConfig) IsAdminIP(host string) bool {
             return true
         }
     }
-    revel.ERROR.Println(host)
     return false
 }
 
