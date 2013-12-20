@@ -2,6 +2,7 @@ package controllers
 
 import (
     "time"
+    "strings"
     "github.com/robfig/revel"
     "github.com/mawenbao/wishome/app"
     "github.com/mawenbao/wishome/app/routes"
@@ -49,8 +50,7 @@ func stopActionTimer(c *revel.Controller) revel.Result {
     if nil == timer {
         timer = &models.ActionTimerResult {
             RemoteAddr: c.Request.RemoteAddr,
-            Controller: c.Name,
-            Action: c.Action,
+            Action: strings.ToLower(c.Action), // transfer action name to lower case
             TotalTime: runTime,
             HitCount: 1,
         }

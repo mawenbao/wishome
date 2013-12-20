@@ -12,7 +12,6 @@ type ActionTimer struct {
 
 type ActionTimerResult struct {
     RemoteAddr,
-    Controller,
     Action string
     TotalTime time.Duration
     HitCount int
