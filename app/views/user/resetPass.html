@@ -1,5 +1,6 @@
 {{append . "moreStyles" "css/form.css"}}
 {{append . "moreScripts" "js/captcha.js"}}
+{{append . "moreScripts" "js/form.js"}}
 {{template "header.html" .}}
 
 <div class="container">
@@ -17,13 +18,13 @@
                     </div>
                     <label for="inputName" class="col-md-5 control-label">{{msg . "form.signup.name"}}</label>
                     <div class="col-md-7">
-                        <input class="form-control" id="inputName" name="name" placeholder="{{msg . "form.signup.name"}}" required {{ with .name }} value="{{.}}" {{else}} autofocus {{end}} />
+                        <input class="form-control" id="inputName" name="name" placeholder="{{msg . "form.signup.name"}}" required {{ with .name }} value="{{.}}" {{end}} />
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail" class="col-md-5 control-label">{{msg . "form.signup.email"}}</label>
                     <div class="col-md-7">
-                        <input type="email" class="form-control" id="inputEmail" name="email" placeholder="{{msg . "form.signup.email"}}" required {{if .email}} value="{{.email}}" {{end}} />
+                        <input type="email" class="form-control" id="inputEmail" name="email" placeholder="{{msg . "form.signup.email"}}" required {{with .email}} value="{{.}}" {{end}} />
                     </div>
                 </div>
                 <div class="form-group">

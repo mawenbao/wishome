@@ -1,5 +1,6 @@
 {{append . "moreStyles" "css/form.css"}}
 {{append . "moreScripts" "js/captcha.js"}}
+{{append . "moreScripts" "js/form.js"}}
 {{template "header.html" .}}
 <div class="container">
     <div class="row">
@@ -14,8 +15,8 @@
         <div class="col-md-3 col-md-offset-4">
             <form class="form-signin form-horizontal" role="form" action="/user/dosignin" method="post">
                 <div class="row">
-                    <input name="name" class="form-control" placeholder="{{msg . "form.signin.name"}}" required {{with .name}}value="{{.}}"{{else}}autofocus{{end}}>
-                    <input name="password" type="password" class="form-control" placeholder="{{msg . "form.signup.password"}}" required {{with .name}}autofocus{{end}}>
+                    <input name="name" id="inputName" class="form-control" placeholder="{{msg . "form.signin.name"}}" required {{with .name}}value="{{.}}"{{end}}>
+                    <input name="password" id="inputPasswd" type="password" class="form-control" placeholder="{{msg . "form.signup.password"}}" required >
                     {{if .needCaptcha}}
                     {{template "captcha.html" .}}
                     {{end}}
