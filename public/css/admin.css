@@ -1,4 +1,6 @@
-.sort-icon {
+.timer-sort-icon {
     margin-left: 2px;
+    cursor: pointer;
+    cursor: hand;
 }
 

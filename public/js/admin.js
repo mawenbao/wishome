@@ -12,7 +12,11 @@ function toggleSortField(elem) {
             $('#timer-sort-field').val(i);
             // set sort order
             var orderObj = $('#timer-sort-order')
-            orderObj.val(1 - orderObj.val())
+            if ($(item).hasClass('fa-sort-asc')) {
+                orderObj.val('0');
+            } else {
+                orderObj.val('1');
+            }
             // set table header icon
             if (0 == orderObj.val()) {
                 $(item).attr('class', 'fa fa-sort-desc timer-sort-icon');
