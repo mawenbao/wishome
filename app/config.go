@@ -78,15 +78,7 @@ func parseOnOff(str string) bool {
     return false
 }
 
-func (gconf *MyGlobalConfig) IsAdminIP(addr string) bool {
-    host := addr
-    var err error
-    if strings.Contains(host, ":") {
-        if host, _, err = net.SplitHostPort(host); nil != err {
-            revel.ERROR.Printf("failed to split address %s", host)
-            return false
-        }
-    }
+func (gconf *MyGlobalConfig) IsAdminIP(host string) bool {
     for _, adminIP := range(gconf.AdminIPList) {
         if adminIP == host {
             return true

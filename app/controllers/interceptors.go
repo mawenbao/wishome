@@ -51,7 +51,7 @@ func stopActionTimer(c *revel.Controller) revel.Result {
     timer := caching.GetActionTimerResult(currAction)
     if nil == timer {
         timer = &models.ActionTimerResult {
-            RemoteAddr: c.Request.RemoteAddr,
+            RemoteAddr: GetRemoteAddr(c),
             Action: currAction,
             TotalTime: runTime,
             HitCount: 1,
@@ -71,9 +71,10 @@ func stopActionTimer(c *revel.Controller) revel.Result {
 
 // check if user is admin
 func (c Admin) checkAdminIP() revel.Result {
-    if !app.MyGlobal.IsAdminIP(c.Request.RemoteAddr) {
+    remoteAddr := GetRemoteAddr(c.Controller)
+    if !app.MyGlobal.IsAdminIP(remoteAddr) {
         c.Flash.Error(c.Message("error.require.signin"))
-        revel.WARN.Printf("%s is not in the admin ip list", c.Request.RemoteAddr)
+        revel.WARN.Printf("%s is not in the admin ip list", remoteAddr)
         return c.Redirect(routes.User.Signin())
     }
     return c.Result

@@ -20,5 +20,6 @@ A simple web site built with revel.
 
 ## Issues
 1. <del>Fix: resetpass.html template will autofocus on the email input even if name is not set.</del>
-2. Fix: admin page controller.Request.RemoteAddr is wrong when using nginx as frontend.
+2. <del>Fix: admin page controller.Request.RemoteAddr is wrong when using nginx as proxy frontend.</del>
+3. Fix: race conditions may happen in caching module of timer results. **USE Redis Instead**.
 

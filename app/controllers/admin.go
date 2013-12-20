@@ -50,7 +50,7 @@ func fetchTimerResults(sortFieldNum int, sortOrder int) []models.TimerJsonResult
 }
 
 func (c Admin) Home() revel.Result {
-    revel.WARN.Printf("admin signed in from %s", c.Request.RemoteAddr)
+    revel.WARN.Printf("admin signed in from %s", GetRemoteAddr(c.Controller))
     moreNavbarLinks := []models.NavbarLink{
     }
     return c.Render(moreNavbarLinks)
