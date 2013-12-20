@@ -13,6 +13,9 @@ const (
     STR_EXPIRE = "expire"
     STR_LASTUSER = "lastuser"
 
+    STR_ON = "on"
+    STR_OFF = "off"
+
     CACHE_RESETPASS = "reset_pass"
     CACHE_SIGNUP_CONFIRM = "signup_confirm"
     CACHE_SIGNIN_ERROR = "signin_err_sess"
@@ -25,7 +28,10 @@ const (
 
     CONFIG_APP_URL = "app.url"
     CONFIG_APP_CPU_NUM = "app.cpu_num"
+
     CONFIG_ADMIN_IP_LIST = "admin.ip_list"
+    CONFIG_ADMIN_TIMER = "admin.timer"
+
     CONFIG_RESETPASS_KEY_LEN = "user.resetpass.keylen"
     CONFIG_RESETPASS_KEY_LIFE = "user.resetpass.keylife"
     CONFIG_SIGNUP_KEY_LEN = "user.signup.keylen"

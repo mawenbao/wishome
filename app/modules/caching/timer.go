@@ -55,7 +55,12 @@ func GetActionTimerResult(action string) *models.ActionTimerResult {
     return nil
 }
 
+// the main entrance
 func GetAllActionTimerResults() []models.ActionTimerResult {
+    if !app.MyGlobal.AdminTimer {
+        return []models.ActionTimerResult{}
+    }
+
     atrs := make([]models.ActionTimerResult, 1)
     if err := cache.Get(app.CACHE_TIMER, &atrs); nil != err {
         revel.INFO.Println("failed to get all timer results from cache, will init a new one")

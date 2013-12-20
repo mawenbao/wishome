@@ -26,11 +26,14 @@ const (
     DFT_SIGNIN_BAN_TIME = time.Hour
 )
 
+// global custom config
 var MyGlobal = new(MyGlobalConfig)
 
 // store global custom configuration in app.conf
 type MyGlobalConfig struct {
     AdminIPList []string
+    AdminTimer bool
+
     AppUrl string
     AppCpuNum int
     AdminIpList []string
@@ -62,6 +65,17 @@ type MyGlobalConfig struct {
 
     TemplateConfirmMail,
     TemplateResetPassMail string
+}
+
+func parseOnOff(str string) bool {
+    if STR_ON == strings.ToLower(strings.TrimSpace(str)) {
+        return true
+    } else if STR_OFF == strings.ToLower(strings.TrimSpace(str)) {
+        return false
+    } else {
+        revel.ERROR.Panicf("unrecogonized on/off string %s", str)
+    }
+    return false
 }
 
 func (gconf *MyGlobalConfig) IsAdminIP(addr string) bool {
@@ -116,6 +130,13 @@ func parseCustomConfig() {
             MyGlobal.AdminIPList = append(MyGlobal.AdminIPList, strings.TrimSpace(ip))
         }
     }
+
+    // parse admin timer on/off
+    adminTimerOnOff, found := revel.Config.String(CONFIG_ADMIN_TIMER)
+    if !found {
+        MyGlobal.AdminTimer = false // default off
+    }
+    MyGlobal.AdminTimer = parseOnOff(adminTimerOnOff)
 
     // parse db related config
     if MyGlobal.DbDriver, found = revel.Config.String(CONFIG_DB_DRIVER); !found {

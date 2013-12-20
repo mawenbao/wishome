@@ -14,9 +14,9 @@ const (
 )
 
 func LoadInterceptors() {
-    // only use action timer in dev mode
-    if revel.DevMode {
-        revel.WARN.Printf("register timer interceptors in dev mode")
+    // only use action timer when admin timer is on
+    if app.MyGlobal.AdminTimer {
+        revel.WARN.Printf("action timer enabled")
         revel.InterceptFunc(startActionTimer, revel.BEFORE, revel.ALL_CONTROLLERS)
         revel.InterceptFunc(stopActionTimer, revel.FINALLY, revel.ALL_CONTROLLERS)
     }
