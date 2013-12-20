@@ -1,3 +1,4 @@
+{{append . "moreStyles" "css/admin.css"}}
 {{append . "moreScripts" "js/admin.js"}}
 {{template "header.html" .}}
 {{template "navbar.html" .}}
@@ -37,7 +38,15 @@
                 <div class="panel-heading">Action Timer Results</div>
                 <div class="panel-body">
                     <table class="table table-bordered">
-                        <thead><tr><th>Action</th><th>Average Time</th><th>Hit count</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <input id="timer-sort-field" type="hidden" value="1" />
+                                <input id="timer-sort-order" type="hidden" value="1" />
+                                <th>Action <i class="fa fa-sort timer-sort-icon" onclick="toggleSortField(this)"></i></th>
+                                <th>Average Time <i class="fa fa-sort-asc timer-sort-icon" onclick="toggleSortField(this)"></i></th>
+                                <th>Hit count <i class="fa fa-sort timer-sort-icon" onclick="toggleSortField(this)"></i></th>
+                            </tr>
+                        </thead>
                         <tbody id="timerResultsTableBody">
                         </tbody>
                     </table>

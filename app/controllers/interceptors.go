@@ -46,11 +46,13 @@ func stopActionTimer(c *revel.Controller) revel.Result {
     currTimer.StopTime = time.Now()
     runTime := currTimer.StopTime.Sub(currTimer.StartTime)
 
-    timer := caching.GetActionTimerResult(c.Action)
+    // use lower case action name
+    currAction := strings.ToLower(c.Action)
+    timer := caching.GetActionTimerResult(currAction)
     if nil == timer {
         timer = &models.ActionTimerResult {
             RemoteAddr: c.Request.RemoteAddr,
-            Action: strings.ToLower(c.Action), // transfer action name to lower case
+            Action: currAction,
             TotalTime: runTime,
             HitCount: 1,
         }

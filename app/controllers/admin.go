@@ -12,51 +12,40 @@ type Admin struct {
     *revel.Controller
 }
 
-type TimerResult struct {
-    Action string `json:"action"`
-    AverageTime string `json:"avgtime"` // format %.3f ms
-    HitCount int `json:"hit"`
-}
-
-type TimerResultByAction []TimerResult
-func (s TimerResultByAction) Len() int { return len(s) }
-func (s TimerResultByAction) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
-func (s TimerResultByAction) Less(i, j int) bool { return s[i].Action < s[j].Action }
-
-type TimerResultByAvgtime []TimerResult
-func (s TimerResultByAvgtime) Len() int { return len(s) }
-func (s TimerResultByAvgtime) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
-func (s TimerResultByAvgtime) Less(i, j int) bool { return s[i].AverageTime > s[j].AverageTime }
-
-type TimerResultByHitcount []TimerResult
-func (s TimerResultByHitcount) Len() int { return len(s) }
-func (s TimerResultByHitcount) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
-func (s TimerResultByHitcount) Less(i, j int) bool { return s[i].HitCount > s[j].HitCount }
-
-func fetchTimerResults(sortFieldNum int) []TimerResult {
+// sortFieldNum is the field index in TimerJsonResult
+// sortOrder: 0 asc, 1 desc
+func fetchTimerResults(sortFieldNum int, sortOrder int) []models.TimerJsonResult {
     allActionTimerResults := caching.GetAllActionTimerResults()
-    timerResults := make([]TimerResult, len(allActionTimerResults))
+    if nil == allActionTimerResults {
+        revel.ERROR.Printf("timer cache not inited")
+        return nil
+    }
+
+    timerResults := make([]models.TimerJsonResult, len(allActionTimerResults))
     for i, atr := range allActionTimerResults {
-        timerResults = append(
-            timerResults[:i],
-            TimerResult{
-                atr.Action,
-                fmt.Sprintf("%.3f ms", atr.TotalTime.Seconds() * 1000 / float64(atr.HitCount)),
-                atr.HitCount,
-            },
-        )
+        result := models.TimerJsonResult {
+            atr.Action,
+            fmt.Sprintf("%.3f ms", atr.TotalTime.Seconds() * 1000 / float64(atr.HitCount)),
+            atr.HitCount,
+        }
+        timerResults = append(timerResults[:i], result)
     }
 
     // sort results, except first timer result TOTAL
+    var sortTgt sort.Interface = models.TimerJsonResultByAvgtime(timerResults)
     switch sortFieldNum {
     case 0:
-        sort.Sort(TimerResultByAction(timerResults)[1:])
+        sortTgt = models.TimerJsonResultByAction(timerResults)
     case 2:
-        sort.Sort(TimerResultByHitcount(timerResults)[1:])
-    default:
-        sort.Sort(TimerResultByAvgtime(timerResults)[1:])
+        sortTgt = models.TimerJsonResultByHitcount(timerResults)
+    }
+    // desc
+    if 1 == sortOrder {
+        sortTgt = sort.Reverse(sortTgt)
     }
 
+    sort.Sort(sortTgt)
+    // put TOTAL timer result in the end
     return timerResults
 }
 
@@ -67,8 +56,8 @@ func (c Admin) Home() revel.Result {
     return c.Render(moreNavbarLinks)
 }
 
-func (c Admin) GetTimerResults(sort int) revel.Result {
-    results := fetchTimerResults(sort)
+func (c Admin) GetTimerResults(sortField int, sortOrder int) revel.Result {
+    results := fetchTimerResults(sortField, sortOrder)
     return c.RenderJson(results)
 }
 
