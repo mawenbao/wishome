@@ -12,7 +12,7 @@ func init() {
 }
 
 func GetRemoteAddr(c *revel.Controller) string {
-    // check X-Forwarded-For header
+    // check first element of X-Forwarded-For header
     if forwds := c.Request.Header.Get("X-Forwarded-For"); "" == forwds {
         // split host and port
         host, _, err := net.SplitHostPort(c.Request.RemoteAddr)
@@ -22,8 +22,7 @@ func GetRemoteAddr(c *revel.Controller) string {
         }
         return strings.TrimSpace(host)
     } else {
-        // pick the first elem in X-Forwarded-For header separated by a comma(,)
-        return strings.TrimSpace(strings.Split(forwds, ",")[0])
+        return strings.TrimSpace(forwds)
     }
 }
 

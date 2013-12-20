@@ -17,7 +17,7 @@ type Admin struct {
 func fetchTimerResults(sortFieldNum int, sortOrder int) []models.TimerJsonResult {
     allActionTimerResults := caching.GetAllActionTimerResults()
     if nil == allActionTimerResults {
-        revel.ERROR.Printf("timer cache not inited")
+        revel.INFO.Printf("timer cache not inited")
         return nil
     }
 
