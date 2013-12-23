@@ -1,6 +1,7 @@
 package controllers
 
 import (
+    "fmt"
     "bytes"
     "github.com/robfig/revel"
     "github.com/mawenbao/wishome/app/results"
@@ -16,10 +17,10 @@ type Captcha struct {
     *revel.Controller
 }
 
-func (c Captcha) GetCaptchaImage(id string) revel.Result {
+func (c Captcha) GetCaptchaImage(id, v string) revel.Result {
     captchaImageBuff := new(bytes.Buffer)
     if !captcha.GenerateCaptchaImage(id, captchaImageBuff) {
-        revel.ERROR.Printf("failed to get catpcha, id %s, return 404", id)
+        revel.ERROR.Printf("failed to get catpcha, id %s version %s, return 404", id, v)
         return c.NotFound("captcha not found") // 404
     }
 
@@ -39,7 +40,10 @@ func (c Captcha) GetCaptcha(captchaid string) revel.Result {
         }
     }
 
-    capResult.ImageURL = "/captcha/getcaptchaimage?id=" + capResult.ID
+    capResult.ImageURL = fmt.Sprintf(
+        "/captcha/getcaptchaimage?id=%s",
+        capResult.ID,
+    )
     return c.RenderJson(capResult)
 }
 

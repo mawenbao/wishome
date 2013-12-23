@@ -10,7 +10,7 @@ function loadCaptcha() {
         data: {captchaid: $('#captchaid').val()},
     }).done(function(resp) {
         $('#captchaid').val(resp.id);
-        $('#captchaimage').attr('src', resp.imageurl);
+        $('#captchaimage').attr('src', resp.imageurl + "&v=" + new Date().getTime());
     });
 }
 
