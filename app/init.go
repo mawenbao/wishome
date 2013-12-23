@@ -1,7 +1,6 @@
 package app
 
 import (
-    "log"
     "github.com/robfig/revel"
 )
 
