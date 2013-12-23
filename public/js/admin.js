@@ -61,10 +61,16 @@ function setTimerResultsTable(resp) {
 
     // set table content
     var totalHitCount = 0; 
+    var totalHitExTimer = 0;
     $.each(resp, function(i, item) {
-        totalHitCount += parseInt(item.hit);
+        var currHit = parseInt(item.hit)
+        totalHitCount += currHit;
+        if ('admin.gettimerresults' != item.action) {
+            totalHitExTimer += currHit;
+        }
         newTimerResultsRow(item.action, item.avgtime, item.hit).appendTo(tableBody);
     });
+    newTimerResultsRow('TOTAL (no timer)', '-', totalHitExTimer).appendTo(tableBody);
     newTimerResultsRow('TOTAL', '-', totalHitCount).appendTo(tableBody);
 }
 
