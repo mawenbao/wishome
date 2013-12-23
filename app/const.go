@@ -53,6 +53,10 @@ const (
     // custom template path, save file content in custom global config
     CONFIG_TEMPLATE_CONFIRM_EMAIL = "template.path.confirm_email"
     CONFIG_TEMPLATE_RESETPASS_EMAIL = "template.path.resetpass_email"
+    // redis config
+    CONFIG_REDIS_SERVER_ADDR = "redis.server.addr"
+    CONFIG_REDIS_POOL_MAXIDLE = "redis.pool.max_idle"
+    CONFIG_REDIS_IDLE_TIMEOUT = "redis.pool.idle_timeout"
 )
 
 // default settings

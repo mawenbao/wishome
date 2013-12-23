@@ -24,6 +24,8 @@ const (
     DFT_SIGNIN_USE_CAPTCHA = 5
     DFT_SIGNIN_ERR_LIMIT = 20
     DFT_SIGNIN_BAN_TIME = time.Hour
+    DFT_REDIS_POOL_MAXIDLE = 20
+    DFT_REDIS_POOL_IDLE_TIMEOUT = 3 * time.Minute
 )
 
 // global custom config
@@ -65,6 +67,10 @@ type MyGlobalConfig struct {
 
     TemplateConfirmMail,
     TemplateResetPassMail string
+
+    RedisServerAddr string
+    RedisPoolMaxIdle int
+    RedisPoolIdleTimeout time.Duration
 }
 
 func parseOnOff(str string) bool {
@@ -285,5 +291,24 @@ func parseCustomConfig() {
         configError(CONFIG_TEMPLATE_RESETPASS_EMAIL, fmt.Sprintf("failed to read resetpass template from %s: %s", MyGlobal.TemplateResetPassMail, err))
     }
     MyGlobal.TemplateResetPassMail = string(resetPassTemplData)
+
+    // parse redis config
+    MyGlobal.RedisServerAddr, found = revel.Config.String(CONFIG_REDIS_SERVER_ADDR)
+    if !found {
+        configNotFound(CONFIG_REDIS_SERVER_ADDR)
+    }
+    MyGlobal.RedisPoolMaxIdle, found = revel.Config.Int(CONFIG_REDIS_POOL_MAXIDLE)
+    if !found {
+        MyGlobal.RedisPoolMaxIdle = 20
+    }
+    redisIdleTimeout, found := revel.Config.String(CONFIG_REDIS_IDLE_TIMEOUT)
+    if !found {
+        MyGlobal.RedisPoolIdleTimeout = DFT_REDIS_POOL_IDLE_TIMEOUT
+    } else {
+        MyGlobal.RedisPoolIdleTimeout, err = time.ParseDuration(redisIdleTimeout)
+        if nil != err {
+            configError(CONFIG_REDIS_IDLE_TIMEOUT, fmt.Sprintf("failed to parse %s: %s", redisIdleTimeout, err))
+        }
+    }
 }
 
