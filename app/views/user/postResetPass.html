@@ -12,9 +12,9 @@
                     <div class="col-md-7 col-md-offset-5">
                         {{template "flash.html" .}}
                     </div>
-                    <label for="inputName" class="col-md-5 control-label">{{msg . "form.signup.name"}}</label>
+                    <label class="col-md-5 control-label">{{msg . "form.signup.name"}}</label>
                     <div class="col-md-7">
-                        <input class="form-control" id="inputName" name="disabledName" placeholder="{{msg . "form.signup.name"}}" value="{{.name}}" disabled />
+                        <p class="form-control-static">{{.name}}</p>
                         <input type="hidden" name="name" value="{{.name}}" />
                     </div>
                 </div>
