@@ -61,10 +61,7 @@ func stopActionTimer(c *revel.Controller) revel.Result {
         timer.TotalTime += runTime
     }
 
-    if !caching.SetActionTimerResult(timer) {
-        revel.ERROR.Printf("failed to set action timer result in cache for %s", c.Action)
-        return nil
-    }
+    caching.SetActionTimerResult(timer)
 
     return c.Result
 }
