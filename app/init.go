@@ -20,10 +20,7 @@ func init() {
 		revel.ActionInvoker,           // Invoke the action.
 	}
 
-    // set log flags
-    log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
-
-    // init my global
+    // init my global, see parseCustomConfig in config.go
     revel.OnAppStart(parseCustomConfig)
 }
 

@@ -7,6 +7,7 @@ title.signin = Welcome to wishome
 title.signup = Sign up to wishome
 title.resetpass = Reset your password
 title.home = User home
+title.admin.home = Admin home
 
 # navbar
 navbar.brand = Wishome

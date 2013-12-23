@@ -53,7 +53,8 @@ func (c Admin) Home() revel.Result {
     revel.WARN.Printf("admin signed in from %s", GetRemoteAddr(c.Controller))
     moreNavbarLinks := []models.NavbarLink{
     }
-    return c.Render(moreNavbarLinks)
+    title := c.Message("title.admin.home")
+    return c.Render(moreNavbarLinks, title)
 }
 
 func (c Admin) GetTimerResults(sortField int, sortOrder int) revel.Result {
