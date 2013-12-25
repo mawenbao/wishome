@@ -33,7 +33,7 @@ function toggleSortField(elem) {
 }
 
 function loadTimerResults() {
-    setInterval(queryTimerResults, 1000);
+    setInterval(queryTimerResults, 3000);
 }
 
 function queryTimerResults() {
