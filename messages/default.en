@@ -8,6 +8,7 @@ title.signup = Sign up to wishome
 title.resetpass = Reset your password
 title.home = User home
 title.admin.home = Admin home
+title.admin.timer = Action timer
 
 # navbar
 navbar.brand = Wishome

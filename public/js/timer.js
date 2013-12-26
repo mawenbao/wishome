@@ -1,6 +1,7 @@
 // load timer results
 
 $(document).ready(function() {
+    queryTimerResults();
     // load timer results
     loadTimerResults();
 })

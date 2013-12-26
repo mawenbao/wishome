@@ -13,7 +13,7 @@
                         <a class="navbar-brand" href="/">{{msg . "navbar.brand"}}</a>
                     </div>
                     <div class="navbar-collapse collapse">
-                        <ul class="nav navbar-right">
+                        <ul class="nav navbar-nav navbar-right">
                             {{range .moreNavbarLinks}}
                             <li {{if .LinkActive}}class="active"{{end}}><a href="{{.LinkURL}}" title="{{.LinkTitle}}">{{.LinkValue}}</a></li>
                             {{end}}
