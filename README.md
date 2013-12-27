@@ -21,5 +21,5 @@ A simple web site built with revel.
 ## Issues
 1. <del>Fix: resetpass.html template will autofocus on the email input even if name is not set.</del>
 2. <del>Fix: admin page controller.Request.RemoteAddr is wrong when using nginx as proxy frontend.</del>
-3. Fix: race conditions may happen in caching module of timer results. **USE Redis Instead**.
-
+3. <del>Fix: race conditions may happen in caching module of timer results. **USE Redis Instead**.</del> Use in-memory cache now
+4. Fix: multiple wishome instances will lead to mismatched captcha storage. Try to use redis to store captcha.
