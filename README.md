@@ -22,4 +22,5 @@ A simple web site built with revel.
 1. <del>Fix: resetpass.html template will autofocus on the email input even if name is not set.</del>
 2. <del>Fix: admin page controller.Request.RemoteAddr is wrong when using nginx as proxy frontend.</del>
 3. <del>Fix: race conditions may happen in caching module of timer results. **USE Redis Instead**.</del> Use in-memory cache now
-4. Fix: multiple wishome instances will lead to mismatched captcha storage. Try to use redis to store captcha.
+4. Fix: multiple wishome instances will lead to mismatched captcha storage. Try using redis to store captcha.
+5. Fix: currently wishome will force signing user out if he has been logged in for $session.life time. User session should be expired only if user has not been active in the last $session.life time.
