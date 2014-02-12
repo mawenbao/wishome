@@ -2,6 +2,10 @@
 
 A simple web site built with revel.
 
+## Demo
+
+Here [wishome.atime.me](http://wishome.atime.me) is a live demo.
+
 ## Dependencies
 
 *  A local smtp server
